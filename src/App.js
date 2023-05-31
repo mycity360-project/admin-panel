@@ -2,10 +2,11 @@ import React, {useState} from "react";
 import {Button, Container, Form} from "react-bootstrap";
 import {http} from "./shared/lib";
 import {env} from "./shared/constants";
+import { LocalStorage } from "./shared/lib";
 function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [token, setToken] = useState(LocalStorage.getData('token') || "");
 
   const handleLogin = async e => {
     e.preventDefault();
