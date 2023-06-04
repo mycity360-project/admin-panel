@@ -1,6 +1,6 @@
 import { React, createContext, useState } from "react";
 
-import { http } from "../shared/lib/axios";
+import { http } from "../shared/lib";
 import { env } from "../shared/constants/env";
 import { LocalStorage } from "../shared/lib/localStorage";
 export const AuthContext = createContext();

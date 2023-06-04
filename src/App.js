@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { env } from "./shared/constants";
-import { LocalStorage } from "./shared/lib";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import PrivateRoute from "./components/PrivateRoute";
