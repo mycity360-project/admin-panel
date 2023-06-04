@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,6 +21,9 @@ const Login = () => {
     console.log("20");
     await login(email, password);
     console.log(isAuthenticated, "23");
+    if (isAuthenticated) {
+      <Navigate to={<Home />} />;
+    }
   };
 
   return (
