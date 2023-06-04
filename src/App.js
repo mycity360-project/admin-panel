@@ -1,81 +1,28 @@
-import React, {useState} from "react";
-import {Button, Container, Form} from "react-bootstrap";
-import {http} from "./shared/lib";
-import {env} from "./shared/constants";
+import React, { useState } from "react";
+
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { env } from "./shared/constants";
 import { LocalStorage } from "./shared/lib";
+import Login from "./components/Login";
+import Home from "./components/Home";
+import PrivateRoute from "./components/PrivateRoute";
+import AuthProvider from "./context/AuthContext";
+
 function App() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [token, setToken] = useState(LocalStorage.getData('token') || "");
-
-  const handleLogin = async e => {
-    e.preventDefault();
-
-    try {
-      const response = await http.post(
-        "user/login/",
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            clientid: env.CLIENT_ID,
-          },
-        }
-      );
-
-      const {access_token: token} = response.data;
-      localStorage.setItem("token", token);
-      setToken(token);
-    } catch (error) {
-      console.error("Login failed", error);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-  };
-
-  if (token) {
-    return (
-      <Container>
-        <h1>Admin Panel</h1>
-        <Button variant="primary" onClick={handleLogout}>
-          Logout
-        </Button>
-      </Container>
-    );
-  }
-
   return (
-    <Container>
-      <h1>Login</h1>
-      <Form onSubmit={handleLogin}>
-        <Form.Group controlId="formEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <PrivateRoute
+            path="/dashboard"
+            component={Home}
+            isAuthenticated={false}
           />
-        </Form.Group>
-        <Form.Group controlId="formPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Login
-        </Button>
-      </Form>
-    </Container>
+          {/* Other public and protected routes */}
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -1,13 +1,12 @@
-import {env} from "../constants";
-
-import axios, {HttpStatusCode} from "axios";
+import { env } from "../constants";
+import axios, { HttpStatusCode } from "axios";
 const APP_PREFIX = "api/v1/";
 
 const axiosInstance = axios.create({
   baseURL: `${env.SERVER_URL}/${APP_PREFIX}`,
 });
 
-axiosInstance.interceptors.response.use(config => {
+axiosInstance.interceptors.response.use((config) => {
   if (
     [
       HttpStatusCode.Accepted,
@@ -23,4 +22,4 @@ axiosInstance.interceptors.response.use(config => {
   }
 });
 
-export {axiosInstance};
+export { axiosInstance };
