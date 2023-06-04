@@ -1,12 +1,13 @@
 import React, { useState, useContext } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isAuthenticated } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
+  const Navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -18,12 +19,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("20");
     await login(email, password);
-    console.log(isAuthenticated, "23");
-    if (isAuthenticated) {
-      <Navigate to={<Home />} />;
-    }
+    Navigate("/home");
   };
 
   return (

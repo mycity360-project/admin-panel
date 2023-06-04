@@ -1,4 +1,4 @@
-import { React, createContext, useState } from "react";
+import { React, createContext, useEffect, useState } from "react";
 import { http } from "../shared/lib";
 import { env } from "../shared/constants";
 import { LocalStorage } from "../shared/lib/localStorage";
@@ -6,8 +6,14 @@ export const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [token, setToken] = useState(LocalStorage.getData("token") || "");
-  const [userInfo, setUserInfo] = useState(null);
+  // const [userInfo, setUserInfo] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const onTokenAvailable = async (token, userid) => {
     let user = await http.get(`user/${userid}/`, {
@@ -20,7 +26,7 @@ const AuthProvider = (props) => {
       LocalStorage.setData("token", token);
       LocalStorage.setData("userInfo", JSON.stringify(user));
       LocalStorage.setData("userID", JSON.stringify(userid));
-      setUserInfo(user);
+      // setUserInfo(user);
       setToken(token);
       setIsAuthenticated(true);
     }
