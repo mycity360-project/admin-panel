@@ -3,7 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoutes from "./components/PrivateRoutes";
 import AuthProvider from "./context/AuthContext";
 
 function App() {
@@ -11,13 +11,11 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route element={<PrivateRoutes />}>
+            <Route path="/home" element={<Home />} />
+          </Route>
           <Route path="/login" element={<Login />} />
-          <PrivateRoute
-            path="/dashboard"
-            component={Home}
-            isAuthenticated={false}
-          />
-          {/* Other public and protected routes */}
+          <Route path="/" element={<Login />} />
         </Routes>
       </Router>
     </AuthProvider>
