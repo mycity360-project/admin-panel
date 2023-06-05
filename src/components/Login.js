@@ -13,7 +13,7 @@ const Login = () => {
     if (isAuthenticated) {
       Navigate("/home");
     }
-  }, []);
+  }, [Navigate, isAuthenticated]);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
