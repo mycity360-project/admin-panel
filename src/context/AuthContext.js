@@ -29,6 +29,8 @@ const AuthProvider = (props) => {
       // setUserInfo(user);
       setToken(token);
       setIsAuthenticated(true);
+    } else {
+      throw new Error("User role is not admin.");
     }
   };
 
@@ -58,7 +60,7 @@ const AuthProvider = (props) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     LocalStorage.clearLocalStorage();
     setToken("");
     setIsAuthenticated(false);
