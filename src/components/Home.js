@@ -3,6 +3,8 @@ import { LocalStorage } from "../shared/lib";
 import { Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import NavigationBar from "./NavigationBar";
+import Sidebar from "./SideBar";
 export default function Home() {
   const { logout } = useContext(AuthContext);
   const Navigate = useNavigate();
@@ -14,10 +16,9 @@ export default function Home() {
 
   return (
     <div>
-      <p>{LocalStorage.getData("token")}</p>
-      <p>{LocalStorage.getData("userID")}</p>
-      <p>{LocalStorage.getData("userInfo")}</p>
-      <Button onClick={handleLogout}>Logout</Button>
+      <NavigationBar />
+      <Sidebar />
+      {/* <Button onClick={handleLogout}>Logout</Button> */}
     </div>
   );
 }
