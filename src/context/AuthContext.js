@@ -13,7 +13,7 @@ const AuthProvider = (props) => {
     if (token) {
       setIsAuthenticated(true);
     }
-  }, []);
+  }, [token]);
 
   const onTokenAvailable = async (token, userid) => {
     let user = await http.get(`user/${userid}/`, {
