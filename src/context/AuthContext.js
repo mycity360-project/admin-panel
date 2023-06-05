@@ -1,13 +1,19 @@
-import { React, createContext, useState } from "react";
-
+import { React, createContext, useEffect, useState } from "react";
 import { http } from "../shared/lib";
-import { env } from "../shared/constants/env";
+import { env } from "../shared/constants";
 import { LocalStorage } from "../shared/lib/localStorage";
 export const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [token, setToken] = useState(LocalStorage.getData("token") || "");
-  const [userInfo, setUserInfo] = useState(null);
+  // const [userInfo, setUserInfo] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const onTokenAvailable = async (token, userid) => {
     let user = await http.get(`user/${userid}/`, {
@@ -16,11 +22,16 @@ const AuthProvider = (props) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    setUserInfo(user);
-    LocalStorage.setItem("token", token);
-    LocalStorage.setItem("userInfo", JSON.stringify(user));
-    LocalStorage.setItem("userID", JSON.stringify(userid));
-    setToken(token);
+    if (user.role === "Admin") {
+      LocalStorage.setData("token", token);
+      LocalStorage.setData("userInfo", JSON.stringify(user));
+      LocalStorage.setData("userID", JSON.stringify(userid));
+      // setUserInfo(user);
+      setToken(token);
+      setIsAuthenticated(true);
+    } else {
+      throw new Error("User role is not admin.");
+    }
   };
 
   const login = async (email, password) => {
@@ -38,8 +49,8 @@ const AuthProvider = (props) => {
         }
       );
 
-      const { access_token: token } = response.data;
-      const userid = token ? response.data.user_id : "";
+      const { access_token: token } = response;
+      const userid = token ? response.user_id : "";
 
       if (token) {
         await onTokenAvailable(token, userid);
@@ -49,12 +60,13 @@ const AuthProvider = (props) => {
     }
   };
 
-  const logout = () => {
-    LocalStorage.clear();
+  const logout = async () => {
+    LocalStorage.clearLocalStorage();
     setToken("");
+    setIsAuthenticated(false);
   };
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
       {props.children}
     </AuthContext.Provider>
   );

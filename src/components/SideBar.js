@@ -2,8 +2,8 @@ import React from "react";
 
 export default function SideBar() {
   return (
-    <View>
-      <Text>SideBar</Text>
-    </View>
+    <div>
+      <p>Side Bar</p>
+    </div>
   );
 }
