@@ -66,7 +66,7 @@ const AuthProvider = (props) => {
     setIsAuthenticated(false);
   };
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ token, isAuthenticated ,login, logout }}>
       {props.children}
     </AuthContext.Provider>
   );
