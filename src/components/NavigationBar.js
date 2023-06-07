@@ -25,17 +25,9 @@ function NavigationBar() {
               id="basic-nav-dropdown"
               style={{ color: "#FFF" }}
             >
-              <NavDropdown.Item href="#" onClick={() => logout()}>
+              <NavDropdown.Item onClick={() => logout()}>
                 Logout
               </NavDropdown.Item>
-              {/* <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item> */}
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
