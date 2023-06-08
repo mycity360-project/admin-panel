@@ -1,1 +1,5 @@
-export const items = ["Item 1", "Item 2", "Item 3"];
+export const items = [
+  { item: "Item 1" },
+  { item: "Item 2" },
+  { item: "Category" },
+];

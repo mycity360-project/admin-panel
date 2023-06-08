@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Image } from "react-bootstrap";
 import { items } from "../shared/constants/sidebarItems";
-const Sidebar = () => {
-  const [activeItem, setActiveItem] = useState(null);
+import DataTable from "react-data-table-component";
+import { Link } from "react-router-dom";
+import Category from "../pages/Category";
 
-  const handleItemClick = (item) => {
-    setActiveItem(item);
-  };
+const Sidebar = ({
+  title,
+  data,
+  columns,
+  handlePageChange,
+  handlePerRowsChange,
+  totalRows,
+}) => {
+  const [loading, setLoading] = useState(false);
+
   return (
-    <div style={{ height: "92vh", marginTop: 50 }}>
+    <div style={{ height: "92vh", marginTop: 150 }}>
       <Container fluid className="h-100">
         <Row className="h-100">
           <Col
@@ -17,15 +25,10 @@ const Sidebar = () => {
             style={{ paddingTop: 10 }}
           >
             {/* Sidebar content */}
-
             <ul>
               {items.map((item, index) => (
-                <li
-                  key={index}
-                  onClick={() => handleItemClick(item)}
-                  style={{ cursor: "pointer" }}
-                >
-                  {item}
+                <li key={index} style={{ cursor: "pointer" }}>
+                  <Link to={`/home/${item.item}`}>{item.item}</Link>
                 </li>
               ))}
             </ul>
@@ -33,9 +36,22 @@ const Sidebar = () => {
           <Col md={9} className="d-flex flex-column">
             {/* Main content */}
             <div className="flex-grow-1">
-              <h1>Main Content</h1>
-              <p>This is the main content area.</p>
-              {activeItem && <p>Selected: {activeItem}</p>}
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                <DataTable
+                  title={title}
+                  columns={columns}
+                  data={data}
+                  keyField="id"
+                  progressPending={loading}
+                  pagination
+                  paginationServer
+                  paginationTotalRows={totalRows}
+                  onChangeRowsPerPage={handlePerRowsChange}
+                  onChangePage={handlePageChange}
+                />
+              )}
             </div>
           </Col>
         </Row>
