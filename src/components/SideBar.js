@@ -12,6 +12,10 @@ const Sidebar = ({
   handlePageChange,
   handlePerRowsChange,
   totalRows,
+  contextActions,
+  onSelectedRowsChange,
+  clearSelectedRows,
+  selectable,
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -50,6 +54,10 @@ const Sidebar = ({
                   paginationTotalRows={totalRows}
                   onChangeRowsPerPage={handlePerRowsChange}
                   onChangePage={handlePageChange}
+                  selectableRows={selectable}
+                  contextActions={contextActions}
+                  onSelectedRowsChange={onSelectedRowsChange}
+                  clearSelectedRows={clearSelectedRows}
                 />
               )}
             </div>

@@ -5,12 +5,17 @@ import { LocalStorage } from "../shared/lib";
 import { http } from "../shared/lib";
 import { Image } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
+import { Form } from "react-bootstrap";
+import moment from "moment/moment";
+import { differenceBy } from "lodash";
 
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   //   const [loading, setLoading] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [toggleCleared, setToggleCleared] = useState(false);
 
   const columns = [
     {
@@ -19,7 +24,7 @@ export default function Category() {
     },
     {
       name: "ID",
-      selector: "id",
+      selector: (row) => row.id,
     },
     {
       name: "Category",
@@ -28,19 +33,33 @@ export default function Category() {
     {
       name: "Icon",
       cell: (row) => {
-        return <Image src={row.icon} width={30} height={30} />;
+        return <Image src={row.icon} width={40} height={40} />;
       },
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
     },
     {
-      name: "Price Required",
+      name: "Price Required ",
+      cell: (row) => {
+        return (
+          <Form>
+            <div className="text-center">
+              <Form.Check
+                type="checkbox"
+                aria-label="Price"
+                checked={row.isPrice}
+                disabled={true}
+              />
+            </div>
+          </Form>
+        );
+      },
       selector: (row) => row.isPrice,
     },
     {
       name: "Created On",
-      selector: (row) => row.created_on,
+      selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
     },
     {
       name: "Price Limit",
@@ -82,6 +101,7 @@ export default function Category() {
         created_on: category.created_date,
         price_limit: category.price_limit,
       }));
+      console.log(categories, "85");
       setTotalRows(categoriesRespData.count);
       setData(categories);
     } catch (error) {
@@ -103,6 +123,36 @@ export default function Category() {
     setPerPage(newPerPage);
   };
 
+  const handleRowSelected = React.useCallback((state) => {
+    setSelectedRows(state.selectedRows);
+  }, []);
+
+  const contextActions = React.useMemo(() => {
+    const handleDelete = () => {
+      if (
+        window.confirm(
+          `Are you sure you want to delete:\r ${selectedRows.map(
+            (r) => r.title
+          )}?`
+        )
+      ) {
+        setToggleCleared(!toggleCleared);
+        setData(differenceBy(data, selectedRows, "title"));
+      }
+    };
+
+    return (
+      <Button
+        key="delete"
+        onClick={handleDelete}
+        style={{ backgroundColor: "red" }}
+        icon
+      >
+        Delete
+      </Button>
+    );
+  }, [data, selectedRows, toggleCleared]);
+
   return (
     <div>
       <NavigationBar />
@@ -110,6 +160,10 @@ export default function Category() {
         title="Category"
         data={data}
         columns={columns}
+        selectable={true}
+        contextActions={contextActions}
+        onSelectedRowsChange={handleRowSelected}
+        clearSelectedRows={toggleCleared}
         totalRows={totalRows}
         handlePageChange={handlePageChange}
         handlePerRowsChange={handlePerRowsChange}

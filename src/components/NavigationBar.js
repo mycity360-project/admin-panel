@@ -6,7 +6,8 @@ import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 
 function NavigationBar() {
-  const { logout } = useContext(AuthContext);
+  const { logout, userInfo } = useContext(AuthContext);
+  console.log(userInfo, "10");
   return (
     <Navbar
       expand="lg"
@@ -21,7 +22,7 @@ function NavigationBar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <NavDropdown
-              title="Hi, Anurag"
+              title={`Hi, ${userInfo.first_name}`}
               id="basic-nav-dropdown"
               style={{ color: "#FFF" }}
             >
