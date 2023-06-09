@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import { Form } from "react-bootstrap";
 import moment from "moment/moment";
 import { differenceBy } from "lodash";
+import { useLocation } from "react-router-dom";
 
 export default function Category() {
   const [data, setData] = useState([]);
@@ -16,6 +17,15 @@ export default function Category() {
   //   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [toggleCleared, setToggleCleared] = useState(false);
+  const [activeMenuItem, setActiveMenuItem] = useState("");
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log(location.pathname, "24");
+    if (location.pathname === "/home/category") {
+      setActiveMenuItem("category");
+    }
+  }, []);
 
   const columns = [
     {
@@ -101,7 +111,7 @@ export default function Category() {
         created_on: category.created_date,
         price_limit: category.price_limit,
       }));
-      console.log(categories, "85");
+
       setTotalRows(categoriesRespData.count);
       setData(categories);
     } catch (error) {
@@ -167,6 +177,7 @@ export default function Category() {
         totalRows={totalRows}
         handlePageChange={handlePageChange}
         handlePerRowsChange={handlePerRowsChange}
+        activeMenuItem={"category"}
       />
     </div>
   );

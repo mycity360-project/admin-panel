@@ -2,14 +2,18 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import {AuthContext} from "../context/AuthContext";
-import {useContext} from "react";
-import {theme} from "../shared/constants";
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
+import { theme } from "../shared/constants";
 
 function NavigationBar() {
-  const {logout, userInfo} = useContext(AuthContext);
+  const { logout, userInfo } = useContext(AuthContext);
   return (
-    <Navbar expand="lg" fixed="top" style={{backgroundColor: theme.primary_color}}>
+    <Navbar
+      expand="lg"
+      fixed="top"
+      style={{ backgroundColor: theme.primary_color, marginLeft: "200px" }}
+    >
       <Container>
         <Navbar.Brand className="font-weight-bold text-white">
           Admin Panel
