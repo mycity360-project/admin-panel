@@ -13,6 +13,7 @@ const SidebarMenu = ({ activeMenuItem }) => {
   const handleMenuItemClick = (menuItem) => {
     setActiveItem(menuItem);
   };
+  
   return (
     <div style={{ display: "flex", height: "100vh", minHeight: "400px" }}>
       <Sidebar backgroundColor={theme.secondary_color} width="201px">
@@ -30,13 +31,20 @@ const SidebarMenu = ({ activeMenuItem }) => {
             },
           }}
         >
-          <MenuItem
+          {/* <MenuItem
             active={activeItem === "home"}
             // onClick={() => handleMenuItemClick("home")}
             component={<Link to="/home" />}
           >
             HomePage
-          </MenuItem>
+          </MenuItem> */}
+          <MenuItem>All Ads</MenuItem>
+          <MenuItem>User List</MenuItem>
+          <MenuItem>Banners</MenuItem>
+          <MenuItem>State</MenuItem>
+          <MenuItem>Location</MenuItem>
+          <MenuItem>Area</MenuItem>
+          <MenuItem>Service</MenuItem>
           <MenuItem
             active={activeItem === "category"}
             // onClick={() => handleMenuItemClick("category")}
@@ -44,6 +52,10 @@ const SidebarMenu = ({ activeMenuItem }) => {
           >
             Category
           </MenuItem>
+          <MenuItem>SubCategory</MenuItem>
+          <MenuItem>Question Mapping</MenuItem>
+
+
         </Menu>
       </Sidebar>
     </div>
