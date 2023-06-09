@@ -11,6 +11,7 @@ import PrivateRoutes from "./components/PrivateRoutes";
 import AuthProvider from "./context/AuthContext";
 import { LocalStorage } from "./shared/lib";
 import Category from "./pages/Category";
+import './App.css';
 
 function App() {
   const token = LocalStorage.getData("token");

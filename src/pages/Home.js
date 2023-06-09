@@ -1,12 +1,12 @@
 import React from "react";
 import NavigationBar from "../components/NavigationBar";
-import Sidebar from "../components/SideBar";
+import SidebarMenu from "../components/SidebarMenu";
 
 export default function Home() {
   return (
     <div>
       <NavigationBar />
-      <Sidebar />
+      <SidebarMenu />
     </div>
   );
 }

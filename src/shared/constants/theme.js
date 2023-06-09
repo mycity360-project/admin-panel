@@ -1,3 +1,4 @@
 module.exports = {
-    color: '#FF8C00'
+    primary_color: '#FF8C00',
+    secondary_color: '#333'
 }

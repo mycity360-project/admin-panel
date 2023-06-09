@@ -9,7 +9,7 @@ import {theme} from "../shared/constants";
 function NavigationBar() {
   const {logout, userInfo} = useContext(AuthContext);
   return (
-    <Navbar expand="lg" fixed="top" style={{backgroundColor: theme.color}}>
+    <Navbar expand="lg" fixed="top" style={{backgroundColor: theme.primary_color}}>
       <Container>
         <Navbar.Brand className="font-weight-bold text-white">
           Admin Panel

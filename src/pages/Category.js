@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
-import Sidebar from "../components/SideBar";
+import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
 import { http } from "../shared/lib";
 import { Image } from "react-bootstrap";
@@ -156,7 +156,7 @@ export default function Category() {
   return (
     <div>
       <NavigationBar />
-      <Sidebar
+      <SidebarMenu
         title="Category"
         data={data}
         columns={columns}
