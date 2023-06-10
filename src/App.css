@@ -6,20 +6,24 @@
   min-height: 100vh !important;
   z-index: 100;
   padding: 48px 0 0;
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
-#sidebar-wrapper{
+#sidebar-wrapper {
   min-height: 100vh !important;
   width: 100vw;
   margin-left: -1rem;
-  -webkit-transition: margin .25s ease-out;
-  -moz-transition: margin .25s ease-out;
-  -o-transition: margin .25s ease-out;
-  transition: margin .25s ease-out;
+  -webkit-transition: margin 0.25s ease-out;
+  -moz-transition: margin 0.25s ease-out;
+  -o-transition: margin 0.25s ease-out;
+  transition: margin 0.25s ease-out;
 }
 #sidebar-wrapper .sidebar-heading {
   padding: 0.875rem 1.25rem;
   font-size: 1.2rem;
+}
+.main-style {
+  height: calc(100vh-50px);
+  margin-top: 50px;
 }
 
 #page-content-wrapper {

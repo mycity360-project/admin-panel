@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { theme } from "../shared/constants";
 
-const SidebarMenu = ({ activeMenuItem }) => {
-  const [activeItem, setActiveItem] = useState("");
-
-  useEffect(() => {
-    activeMenuItem && setActiveItem(activeMenuItem);
-  }, []);
-
-  const handleMenuItemClick = (menuItem) => {
-    setActiveItem(menuItem);
-  };
-  
+const SidebarMenu = () => {
   return (
-    <div style={{ display: "flex", height: "100vh", minHeight: "400px" }}>
-      <Sidebar backgroundColor={theme.secondary_color} width="201px">
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        minHeight: "400px",
+      }}
+    >
+      <Sidebar
+        backgroundColor={theme.secondary_color}
+        width="251px"
+        fixed="left"
+      >
         <Menu
           menuItemStyles={{
             button: ({ active, disabled }) => {
@@ -27,35 +27,66 @@ const SidebarMenu = ({ activeMenuItem }) => {
                   backgroundColor: "#666",
                   color: "#FF8C00",
                 },
+                justifyContent: "center",
               };
             },
           }}
         >
-          {/* <MenuItem
-            active={activeItem === "home"}
-            // onClick={() => handleMenuItemClick("home")}
-            component={<Link to="/home" />}
-          >
-            HomePage
-          </MenuItem> */}
-          <MenuItem>All Ads</MenuItem>
-          <MenuItem>User List</MenuItem>
-          <MenuItem>Banners</MenuItem>
-          <MenuItem>State</MenuItem>
-          <MenuItem>Location</MenuItem>
-          <MenuItem>Area</MenuItem>
-          <MenuItem>Service</MenuItem>
           <MenuItem
-            active={activeItem === "category"}
-            // onClick={() => handleMenuItemClick("category")}
+            active={window.location.pathname === "/home/all-ads"}
+            component={<Link to="home/all-ads" />}
+          >
+            All Ads
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/user-list"}
+            component={<Link to="/home/user-list" />}
+          >
+            User List
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/banners"}
+            component={<Link to="/home/banners" />}
+          >
+            Banners
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/state"}
+            component={<Link to="/home/state" />}
+          >
+            State
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/location"}
+            component={<Link to="/home/location" />}
+          >
+            Location
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/area"}
+            component={<Link to="/home/area" />}
+          >
+            Area
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "home/service"}
+            component={<Link to="/home/service" />}
+          >
+            Service
+          </MenuItem>
+          <MenuItem
+            active={window.location.pathname === "/home/category"}
             component={<Link to="/home/category" />}
           >
             Category
           </MenuItem>
-          <MenuItem>SubCategory</MenuItem>
+          <MenuItem
+            active={window.location.pathname === "/home/sub-category"}
+            component={<Link to="/home/sub-category" />}
+          >
+            SubCategory
+          </MenuItem>
           <MenuItem>Question Mapping</MenuItem>
-
-
         </Menu>
       </Sidebar>
     </div>

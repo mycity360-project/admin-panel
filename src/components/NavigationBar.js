@@ -12,7 +12,11 @@ function NavigationBar() {
     <Navbar
       expand="lg"
       fixed="top"
-      style={{ backgroundColor: theme.primary_color, marginLeft: "200px" }}
+      style={{
+        backgroundColor: theme.primary_color,
+        marginLeft: "250px",
+        height: "50px",
+      }}
     >
       <Container>
         <Navbar.Brand className="font-weight-bold text-white">

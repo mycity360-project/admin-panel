@@ -4,38 +4,22 @@ import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
 import { http } from "../shared/lib";
 import { Image } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import { Form } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import moment from "moment/moment";
-import { differenceBy } from "lodash";
-import { useLocation } from "react-router-dom";
-
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   //   const [loading, setLoading] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [toggleCleared, setToggleCleared] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState("");
-  const location = useLocation();
-
-  useEffect(() => {
-    console.log(location.pathname, "24");
-    if (location.pathname === "/home/category") {
-      setActiveMenuItem("category");
-    }
-  }, []);
 
   const columns = [
     {
       name: "Sr No.",
       cell: (row, index) => <div>{index + 1}</div>,
     },
-    {
-      name: "ID",
-      selector: (row) => row.id,
-    },
+
     {
       name: "Category",
       selector: (row) => row.name,
@@ -50,19 +34,23 @@ export default function Category() {
       button: true,
     },
     {
-      name: "Price Required ",
+      name: "Price\nRequired ",
       cell: (row) => {
         return (
-          <Form>
-            <div className="text-center">
-              <Form.Check
-                type="checkbox"
-                aria-label="Price"
-                checked={row.isPrice}
-                disabled={true}
-              />
-            </div>
-          </Form>
+          <Container>
+            <Row className="justify-content-center">
+              <Col md={6}>
+                <Form>
+                  <Form.Check
+                    type="checkbox"
+                    aria-label="Price"
+                    checked={row.isPrice}
+                    disabled={true}
+                  />
+                </Form>
+              </Col>
+            </Row>
+          </Container>
         );
       },
       selector: (row) => row.isPrice,
@@ -70,18 +58,32 @@ export default function Category() {
     {
       name: "Created On",
       selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+
+      compact: true,
     },
     {
       name: "Price Limit",
       selector: (row) => row.price_limit,
+
+      compact: true,
     },
     {
+      name: "Action",
       cell: (row) => (
         <div className="text-center">
-          <Button variant="light" onClick={() => console.log("edit 52")}>
-            Edit
-          </Button>
-          <Button variant="danger">Delete</Button>
+          <MdModeEditOutline
+            color="#444"
+            size={20}
+            onClick={() => handleEdit()}
+            cursor="pointer"
+          />
+          <MdDelete
+            color="#444"
+            size={20}
+            cursor="pointer"
+            style={{ marginLeft: "10px" }}
+            onClick={() => handleDelete(row.id)}
+          />
         </div>
       ),
       ignoreRowClick: true,
@@ -92,6 +94,7 @@ export default function Category() {
 
   const getCategories = async (page) => {
     // setLoading(true);
+
     try {
       const token = LocalStorage.getData("token");
       const categoriesRespData = await http.get(
@@ -125,60 +128,55 @@ export default function Category() {
     getCategories(1);
   }, [perPage]);
 
-  const handlePageChange = (page) => {
-    getCategories(page);
+  const deleteCategory = async (id) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const respData = await http.delete(`category/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.log(error, "165");
+    }
+  };
+
+  const handlePageChange = async (page) => {
+    await getCategories(page);
   };
 
   const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
-  const handleRowSelected = React.useCallback((state) => {
-    setSelectedRows(state.selectedRows);
-  }, []);
+  const handleAdd = () => {
+    console.log("add");
+  };
 
-  const contextActions = React.useMemo(() => {
-    const handleDelete = () => {
-      if (
-        window.confirm(
-          `Are you sure you want to delete:\r ${selectedRows.map(
-            (r) => r.title
-          )}?`
-        )
-      ) {
-        setToggleCleared(!toggleCleared);
-        setData(differenceBy(data, selectedRows, "title"));
-      }
-    };
+  const handleEdit = () => {
+    console.log("edit");
+  };
 
-    return (
-      <Button
-        key="delete"
-        onClick={handleDelete}
-        style={{ backgroundColor: "red" }}
-        icon
-      >
-        Delete
-      </Button>
-    );
-  }, [data, selectedRows, toggleCleared]);
+  const handleDelete = async (id) => {
+    await deleteCategory(id);
+  };
 
   return (
     <div>
       <NavigationBar />
-      <SidebarMenu
-        title="Category"
-        data={data}
-        columns={columns}
-        selectable={true}
-        contextActions={contextActions}
-        onSelectedRowsChange={handleRowSelected}
-        clearSelectedRows={toggleCleared}
-        totalRows={totalRows}
-        handlePageChange={handlePageChange}
-        handlePerRowsChange={handlePerRowsChange}
-        activeMenuItem={"category"}
-      />
+      <div className="d-flex">
+        <SidebarMenu />
+        <MainContent
+          title="Category"
+          data={data}
+          columns={columns}
+          totalRows={totalRows}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
+          handleAdd={handleAdd}
+          handleDelete={handleDelete}
+        />
+      </div>
     </div>
   );
 }
