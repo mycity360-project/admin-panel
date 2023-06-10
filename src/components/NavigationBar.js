@@ -4,27 +4,30 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
+import { theme } from "../shared/constants";
 
 function NavigationBar() {
-  const { logout } = useContext(AuthContext);
+  const { logout, userInfo } = useContext(AuthContext);
   return (
     <Navbar
       expand="lg"
       fixed="top"
-      style={{ backgroundColor: "#FF8C00", height: "8vh" }}
+      style={{
+        backgroundColor: theme.primary_color,
+        marginLeft: "250px",
+        height: "50px",
+      }}
     >
       <Container>
-        <Navbar.Brand href="#home" style={{ color: "#FFF", fontWeight: 500 }}>
-          MyCity360
+        <Navbar.Brand className="font-weight-bold text-white">
+          Admin Panel
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <NavDropdown
-              title="Hi, Anurag"
-              id="basic-nav-dropdown"
-              style={{ color: "#FFF" }}
-            >
+            <NavDropdown title="Settings" id="basic-nav-dropdown">
+              <NavDropdown.Item>Hi {userInfo.first_name}</NavDropdown.Item>
+              <NavDropdown.Divider />
               <NavDropdown.Item onClick={() => logout()}>
                 Logout
               </NavDropdown.Item>

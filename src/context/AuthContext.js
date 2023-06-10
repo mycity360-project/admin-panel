@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [token, setToken] = useState(LocalStorage.getData("token") || "");
-  // const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const AuthProvider = (props) => {
       LocalStorage.setData("token", token);
       LocalStorage.setData("userInfo", JSON.stringify(user));
       LocalStorage.setData("userID", JSON.stringify(userid));
-      // setUserInfo(user);
+      setUserInfo(user);
       setToken(token);
       setIsAuthenticated(true);
     } else {
@@ -59,6 +59,20 @@ const AuthProvider = (props) => {
       console.error("Login failed", error);
     }
   };
+  const isLoggedIn = async () => {
+    try {
+      let token = LocalStorage.getData("token");
+      let user = LocalStorage.getData("userInfo");
+      setUserInfo(JSON.parse(user));
+      setToken(token);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    isLoggedIn();
+  }, []);
 
   const logout = async () => {
     LocalStorage.clearLocalStorage();
@@ -66,7 +80,9 @@ const AuthProvider = (props) => {
     setIsAuthenticated(false);
   };
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated ,login, logout }}>
+    <AuthContext.Provider
+      value={{ token, isAuthenticated, userInfo, login, logout }}
+    >
       {props.children}
     </AuthContext.Provider>
   );
