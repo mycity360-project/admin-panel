@@ -8,6 +8,7 @@ import { Container, Row, Col, Form } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
+
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -158,7 +159,10 @@ export default function Category() {
   };
 
   const handleDelete = async (id) => {
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
     await deleteCategory(id);
+    if (shouldDelete) {
+    }
   };
 
   return (
