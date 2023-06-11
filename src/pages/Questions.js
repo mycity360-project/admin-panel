@@ -13,43 +13,33 @@ export default function Questions() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  //   const [loading, setLoading] = useState(false);
 
   const columns = [
     {
       name: "Sr No.",
       cell: (row, index) => <div>{index + 1}</div>,
     },
-
     {
-      name: "Sub-category",
-      selector: (row) => row.name,
+      name: "question",
+      selector: (row) => row.question,
     },
     {
-      name: "Icon",
-      cell: (row) => {
-        return <Image src={row.icon} width={40} height={40} />;
+        name: "Feild Type",
+        selector: (row) => row.field_type,
       },
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-    },
     {
-      name: "Price\nRequired ",
-      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true}/>,
-      selector: (row) => row.isPrice,
+      name: "Required",
+      cell: (row) => <Checkbox value={row.is_required} isDisabled={true}/>,
+      selector: (row) => row.is_required,
     },
     {
       name: "Created On",
       selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
-
       compact: true,
     },
     {
-      name: "Price Limit",
-      selector: (row) => row.price_limit,
-
-      compact: true,
+        name: "Category/Sub-category",
+        selector: (row) => row.category.id,
     },
     {
       name: "Action",
@@ -81,26 +71,17 @@ export default function Questions() {
 
     try {
       const token = LocalStorage.getData("token");
-      const categoriesRespData = await http.get(
-        `category/?page=${page}&page_size=${perPage}`,
+      const questionResp = await http.get(
+        `question/?page=${page}&page_size=${perPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      const categories = categoriesRespData.results.map((category) => ({
-        id: category.id.toString(),
-        name: category.name,
-        icon: category.icon,
-        seq: category.sequence,
-        isPrice: category.is_price,
-        created_on: category.created_date,
-        price_limit: category.price_limit,
-      }));
 
-      setTotalRows(categoriesRespData.count);
-      setData(categories);
+      setTotalRows(questionResp.count);
+      setData(questionResp.results);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -115,7 +96,7 @@ export default function Questions() {
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
-      const respData = await http.delete(`category/${id}/`, {
+      await http.delete(`question/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

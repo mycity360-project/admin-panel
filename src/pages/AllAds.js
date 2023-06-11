@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import {LocalStorage} from "../shared/lib";
@@ -69,7 +69,7 @@ export default function AllAds() {
     },
   ];
 
-  const getUserAds = async page => {
+  const getUserAds = useCallback(async page => {
     // setLoading(true);
 
     try {
@@ -89,12 +89,12 @@ export default function AllAds() {
     } finally {
       //   setLoading(false);
     }
-  };
+  }, [perPage]);
 
   useEffect(() => {
     console.log("User Effect called");
     getUserAds(1);
-  }, [perPage]);
+  }, [getUserAds]);
 
   const deleteUserAd = async id => {
     try {

@@ -11,7 +11,7 @@ export const MainContent = ({
   handleAdd,
 }) => {
   return (
-    <Container className="main-content main-style">
+    <Container className="main-content main-style" >
       <Button title="Add" onClick={() => handleAdd()} />
       <DataTable
         data={data}
