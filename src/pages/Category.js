@@ -17,8 +17,6 @@ export default function Category() {
   const [showForm, setShowForm] = useState(false);
 
   const fields = [
-    // name is for formik , initialValues  and all...
-    // label is to show input field name on form
     {
       name: "Name",
       label: "Name",
@@ -40,11 +38,17 @@ export default function Category() {
       validation: Yup.string().required("Price Limit is required"),
     },
     {
-      name: "Price Required",
-      label: "Price Required",
+      name: "Is Price Required",
+      label: "Is Price Required",
       type: "checkbox",
-      validation: Yup.string().required("Name is required"),
+      validation: Yup.string().required("Price is required"),
     },
+    {
+      name: "Phone",
+      label: "Phone",
+      type: "text",
+      validation: Yup.string().required("Phone is required")
+    }
   ];
 
   const columns = [
@@ -138,7 +142,7 @@ export default function Category() {
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
-      const respData = await http.delete(`category/${id}/`, {
+      await http.delete(`category/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -171,6 +175,11 @@ export default function Category() {
     setShowForm(!showForm);
   };
 
+  const handleFormSubmit = (event, val) => {
+    event.preventDefault()
+    console.log(event)
+  }
+
   return (
     <div>
       <NavigationBar />
@@ -188,6 +197,7 @@ export default function Category() {
           showForm={showForm}
           fields={fields}
           modalHeading={"Add Category"}
+          handleFormSubmit={handleFormSubmit}
         />
       </div>
     </div>

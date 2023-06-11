@@ -37,7 +37,7 @@ const FormModal = ({ show, onHide, fields, modalHeading }) => {
           }) => (
             <Form onSubmit={handleSubmit}>
               {fields.map((field) => (
-                <Form.Group controlId={field.name} key={field.name}>
+                <Form.Group controlId={field.name} key={field.name} style={{padding: 10}}>
                   {field.type !== "checkbox" ? (
                     <>
                       <Form.Label>{field.label}</Form.Label>

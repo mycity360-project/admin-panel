@@ -12,6 +12,7 @@ export const MainContent = ({
   showForm,
   fields,
   modalHeading,
+  handleFormSubmit
 }) => {
   return (
     <Container className="main-content main-style">
@@ -52,6 +53,8 @@ export const MainContent = ({
           onHide={() => handleToggleModal()}
           fields={fields}
           modalHeading={modalHeading}
+          handleSubmit={handleFormSubmit}
+          
         />
       )}
     </Container>
