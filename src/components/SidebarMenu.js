@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { theme } from "../shared/constants";
+import {Link} from "react-router-dom";
+import {Sidebar, Menu, MenuItem} from "react-pro-sidebar";
+import {theme} from "../shared/constants";
 
 const SidebarMenu = () => {
   return (
@@ -19,7 +19,7 @@ const SidebarMenu = () => {
       >
         <Menu
           menuItemStyles={{
-            button: ({ active, disabled }) => {
+            button: ({active, disabled}) => {
               return {
                 color: active ? "#FF8C00" : "#FFF",
                 backgroundColor: active ? "#444" : undefined,
@@ -33,43 +33,43 @@ const SidebarMenu = () => {
           }}
         >
           <MenuItem
-            active={window.location.pathname === "/home/all-ads"}
-            component={<Link to="home/all-ads" />}
+            active={window.location.pathname === "/home"}
+            component={<Link to="/home" />}
           >
             All Ads
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/user-list"}
+            active={window.location.pathname === "/home/user-list"}
             component={<Link to="/home/user-list" />}
           >
             User List
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/banners"}
+            active={window.location.pathname === "/home/banners"}
             component={<Link to="/home/banners" />}
           >
             Banners
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/state"}
+            active={window.location.pathname === "/home/state"}
             component={<Link to="/home/state" />}
           >
             State
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/location"}
+            active={window.location.pathname === "/home/location"}
             component={<Link to="/home/location" />}
           >
             Location
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/area"}
+            active={window.location.pathname === "/home/area"}
             component={<Link to="/home/area" />}
           >
             Area
           </MenuItem>
           <MenuItem
-            active={window.location.pathname === "home/service"}
+            active={window.location.pathname === "/home/service"}
             component={<Link to="/home/service" />}
           >
             Service
@@ -86,7 +86,12 @@ const SidebarMenu = () => {
           >
             SubCategory
           </MenuItem>
-          <MenuItem>Question Mapping</MenuItem>
+          <MenuItem
+            active={window.location.pathname === "/home/questions"}
+            component={<Link to="/home/questions" />}
+          >
+            Questions
+          </MenuItem>
         </Menu>
       </Sidebar>
     </div>
