@@ -1,12 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
+import { Image } from "react-bootstrap";
+import moment from "moment/moment";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
+import { Checkbox } from "../components/checkbox";
 
-export default function State() {
+export default function Questions() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
@@ -17,12 +20,30 @@ export default function State() {
       cell: (row, index) => <div>{index + 1}</div>,
     },
     {
-      name: "Name",
-      selector: row => row.name,
+      name: "question",
+      selector: (row) => row.question,
+    },
+    {
+        name: "Feild Type",
+        selector: (row) => row.field_type,
+      },
+    {
+      name: "Required",
+      cell: (row) => <Checkbox value={row.is_required} isDisabled={true}/>,
+      selector: (row) => row.is_required,
+    },
+    {
+      name: "Created On",
+      selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+      compact: true,
+    },
+    {
+        name: "Category/Sub-category",
+        selector: (row) => row.category.id,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -34,7 +55,7 @@ export default function State() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -45,22 +66,22 @@ export default function State() {
     },
   ];
 
-  const getStates = async page => {
+  const getCategories = async (page) => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const stateData = await http.get(
-        `state/`,
+      const questionResp = await http.get(
+        `question/?page=${page}&page_size=${perPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(stateData)
-      setTotalRows(stateData.length);
-      setData(stateData);
+
+      setTotalRows(questionResp.count);
+      setData(questionResp.results);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -69,13 +90,13 @@ export default function State() {
   };
 
   useEffect(() => {
-    getStates(1);
+    getCategories(1);
   }, [perPage]);
 
-  const deleteState = async id => {
+  const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
-      await http.delete(`state/${id}/`, {
+      await http.delete(`question/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,11 +106,11 @@ export default function State() {
     }
   };
 
-  const handlePageChange = async page => {
-    await getStates(page);
+  const handlePageChange = async (page) => {
+    await getCategories(page);
   };
 
-  const handlePerRowsChange = async newPerPage => {
+  const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
@@ -101,8 +122,8 @@ export default function State() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
-    await deleteState(id);
+  const handleDelete = async (id) => {
+    await deleteCategory(id);
   };
 
   return (
@@ -111,7 +132,7 @@ export default function State() {
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Area"
+          title="Category"
           data={data}
           columns={columns}
           totalRows={totalRows}
