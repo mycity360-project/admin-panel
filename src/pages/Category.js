@@ -7,13 +7,45 @@ import { Image } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
+import * as Yup from "yup";
 import { Checkbox } from "../components/checkbox";
 
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  //   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  const fields = [
+    // name is for formik , initialValues  and all...
+    // label is to show input field name on form
+    {
+      name: "Name",
+      label: "Name",
+      type: "text",
+      validation: Yup.string().required("Name is required"),
+      defaultValue: 0,
+    },
+    {
+      name: "Icon",
+      label: "Icon",
+      type: "file",
+      validation: Yup.string().required("Icon is required"),
+    },
+    {
+      name: "Price Limit",
+      label: "Price Limit",
+      type: "number",
+      defaultValue: 0,
+      validation: Yup.string().required("Price Limit is required"),
+    },
+    {
+      name: "Price Required",
+      label: "Price Required",
+      type: "checkbox",
+      validation: Yup.string().required("Name is required"),
+    },
+  ];
 
   const columns = [
     {
@@ -30,9 +62,6 @@ export default function Category() {
       cell: (row) => {
         return <Image src={row.icon} width={40} height={40} />;
       },
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
     },
     {
       name: "Price\nRequired ",
@@ -42,14 +71,10 @@ export default function Category() {
     {
       name: "Created On",
       selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
-
-      compact: true,
     },
     {
       name: "Price Limit",
       selector: (row) => row.price_limit,
-
-      compact: true,
     },
     {
       name: "Action",
@@ -77,8 +102,6 @@ export default function Category() {
   ];
 
   const getCategories = async (page) => {
-    // setLoading(true);
-
     try {
       const token = LocalStorage.getData("token");
       const categoriesRespData = await http.get(
@@ -133,16 +156,19 @@ export default function Category() {
     setPerPage(newPerPage);
   };
 
-  const handleAdd = () => {
-    console.log("add");
-  };
-
   const handleEdit = () => {
     console.log("edit");
   };
 
   const handleDelete = async (id) => {
-    await deleteCategory(id);
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteCategory(id);
+    }
+  };
+
+  const handleToggleModal = () => {
+    setShowForm(!showForm);
   };
 
   return (
@@ -157,8 +183,11 @@ export default function Category() {
           totalRows={totalRows}
           handlePageChange={handlePageChange}
           handlePerRowsChange={handlePerRowsChange}
-          handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handleToggleModal={handleToggleModal}
+          showForm={showForm}
+          fields={fields}
+          modalHeading={"Add Category"}
         />
       </div>
     </div>
