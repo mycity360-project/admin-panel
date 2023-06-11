@@ -4,10 +4,11 @@ import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
 import { http } from "../shared/lib";
 import { Image } from "react-bootstrap";
-import { Container, Row, Col, Form } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
+import { Checkbox } from "../components/checkbox";
+
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -35,24 +36,7 @@ export default function Category() {
     },
     {
       name: "Price\nRequired ",
-      cell: (row) => {
-        return (
-          <Container>
-            <Row className="justify-content-center">
-              <Col md={6}>
-                <Form>
-                  <Form.Check
-                    type="checkbox"
-                    aria-label="Price"
-                    checked={row.isPrice}
-                    disabled={true}
-                  />
-                </Form>
-              </Col>
-            </Row>
-          </Container>
-        );
-      },
+      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true}/>,
       selector: (row) => row.isPrice,
     },
     {

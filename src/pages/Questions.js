@@ -7,8 +7,9 @@ import { Image } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
+import { Checkbox } from "../components/checkbox";
 
-export default function Service() {
+export default function Questions() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
@@ -19,8 +20,9 @@ export default function Service() {
       name: "Sr No.",
       cell: (row, index) => <div>{index + 1}</div>,
     },
+
     {
-      name: "Name",
+      name: "Sub-category",
       selector: (row) => row.name,
     },
     {
@@ -33,8 +35,20 @@ export default function Service() {
       button: true,
     },
     {
+      name: "Price\nRequired ",
+      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true}/>,
+      selector: (row) => row.isPrice,
+    },
+    {
       name: "Created On",
       selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+
+      compact: true,
+    },
+    {
+      name: "Price Limit",
+      selector: (row) => row.price_limit,
+
       compact: true,
     },
     {
@@ -62,21 +76,31 @@ export default function Service() {
     },
   ];
 
-  const getService = async (page) => {
+  const getCategories = async (page) => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const services = await http.get(
-        `service/`,
+      const categoriesRespData = await http.get(
+        `category/?page=${page}&page_size=${perPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setTotalRows(services.length);
-      setData(services);
+      const categories = categoriesRespData.results.map((category) => ({
+        id: category.id.toString(),
+        name: category.name,
+        icon: category.icon,
+        seq: category.sequence,
+        isPrice: category.is_price,
+        created_on: category.created_date,
+        price_limit: category.price_limit,
+      }));
+
+      setTotalRows(categoriesRespData.count);
+      setData(categories);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -85,13 +109,13 @@ export default function Service() {
   };
 
   useEffect(() => {
-    getService(1);
+    getCategories(1);
   }, [perPage]);
 
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
-      await http.delete(`service/${id}/`, {
+      const respData = await http.delete(`category/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -102,7 +126,7 @@ export default function Service() {
   };
 
   const handlePageChange = async (page) => {
-    await getService(page);
+    await getCategories(page);
   };
 
   const handlePerRowsChange = async (newPerPage) => {
