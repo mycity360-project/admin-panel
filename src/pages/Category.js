@@ -13,6 +13,7 @@ import { Checkbox } from "../components/checkbox";
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const [showForm, setShowForm] = useState(false);
 
@@ -47,14 +48,16 @@ export default function Category() {
       name: "Phone",
       label: "Phone",
       type: "text",
-      validation: Yup.string().required("Phone is required")
-    }
+      validation: Yup.string().required("Phone is required"),
+    },
   ];
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => {
+        return <div> {(currentPage - 1) * perPage + (index + 1)}</div>;
+      },
     },
 
     {
@@ -69,7 +72,7 @@ export default function Category() {
     },
     {
       name: "Price\nRequired ",
-      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true}/>,
+      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true} />,
       selector: (row) => row.isPrice,
     },
     {
@@ -153,6 +156,7 @@ export default function Category() {
   };
 
   const handlePageChange = async (page) => {
+    setCurrentPage(page);
     await getCategories(page);
   };
 
@@ -176,9 +180,9 @@ export default function Category() {
   };
 
   const handleFormSubmit = (event, val) => {
-    event.preventDefault()
-    console.log(event)
-  }
+    event.preventDefault();
+    console.log(event);
+  };
 
   return (
     <div>

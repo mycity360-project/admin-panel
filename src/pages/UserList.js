@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
 import moment from "moment/moment";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 
 export default function UserList() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
@@ -19,32 +20,32 @@ export default function UserList() {
     },
     {
       name: "Email",
-      selector: row => row.email,
+      selector: (row) => row.email,
     },
     {
       name: "Phone",
-      selector: row => row.phone,
+      selector: (row) => row.phone,
     },
     {
       name: "Name",
-      selector: row => `${row.first_name} ${row.last_name}`,
+      selector: (row) => `${row.first_name} ${row.last_name}`,
     },
     {
       name: "Location",
-      selector: row => row.area.location.name,
+      selector: (row) => row.area.location.name,
     },
     {
       name: "Area",
-      selector: row => row.area.name,
+      selector: (row) => row.area.name,
     },
     {
       name: "Created On",
-      selector: row => moment(row.created_date).format("DD MMM YYYY"),
+      selector: (row) => moment(row.created_date).format("DD MMM YYYY"),
       compact: true,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -56,7 +57,7 @@ export default function UserList() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -67,7 +68,7 @@ export default function UserList() {
     },
   ];
 
-  const getUserList = async page => {
+  const getUserList = async (page) => {
     // setLoading(true);
 
     try {
@@ -93,7 +94,7 @@ export default function UserList() {
     getUserList(1);
   }, [perPage]);
 
-  const deleteArea = async id => {
+  const deleteArea = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`user/${id}/`, {
@@ -106,11 +107,11 @@ export default function UserList() {
     }
   };
 
-  const handlePageChange = async page => {
+  const handlePageChange = async (page) => {
     await getUserList(page);
   };
 
-  const handlePerRowsChange = async newPerPage => {
+  const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
@@ -122,7 +123,7 @@ export default function UserList() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteArea(id);
   };
 

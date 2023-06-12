@@ -5,6 +5,7 @@ import FormModal from "./FormModal";
 export const MainContent = ({
   data,
   columns,
+  isRemote,
   totalRows,
   handlePageChange,
   handlePerRowsChange,
@@ -12,7 +13,7 @@ export const MainContent = ({
   showForm,
   fields,
   modalHeading,
-  handleFormSubmit
+  handleFormSubmit,
 }) => {
   return (
     <Container className="main-content main-style">
@@ -31,10 +32,10 @@ export const MainContent = ({
       <DataTable
         data={data}
         columns={columns}
-        dense
-        striped
-        pagination
-        paginationServer
+        dense={true}
+        striped={true}
+        pagination={isRemote}
+        paginationServer={isRemote}
         paginationTotalRows={totalRows}
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
@@ -54,7 +55,6 @@ export const MainContent = ({
           fields={fields}
           modalHeading={modalHeading}
           handleSubmit={handleFormSubmit}
-          
         />
       )}
     </Container>

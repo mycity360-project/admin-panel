@@ -1,14 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 
 export default function State() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
@@ -18,11 +20,11 @@ export default function State() {
     },
     {
       name: "Name",
-      selector: row => row.name,
+      selector: (row) => row.name,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -34,7 +36,7 @@ export default function State() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -45,20 +47,17 @@ export default function State() {
     },
   ];
 
-  const getStates = async page => {
+  const getStates = async (page) => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const stateData = await http.get(
-        `state/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(stateData)
+      const stateData = await http.get(`state/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(stateData);
       setTotalRows(stateData.length);
       setData(stateData);
     } catch (error) {
@@ -72,7 +71,7 @@ export default function State() {
     getStates(1);
   }, [perPage]);
 
-  const deleteState = async id => {
+  const deleteState = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`state/${id}/`, {
@@ -85,11 +84,11 @@ export default function State() {
     }
   };
 
-  const handlePageChange = async page => {
+  const handlePageChange = async (page) => {
     await getStates(page);
   };
 
-  const handlePerRowsChange = async newPerPage => {
+  const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
@@ -101,7 +100,7 @@ export default function State() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteState(id);
   };
 

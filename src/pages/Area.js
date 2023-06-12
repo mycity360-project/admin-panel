@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 
 export default function Area() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
@@ -18,19 +19,19 @@ export default function Area() {
     },
     {
       name: "Name",
-      selector: row => row.name,
+      selector: (row) => row.name,
     },
     {
       name: "Pin Code",
-      selector: row => row.pincode,
+      selector: (row) => row.pincode,
     },
     {
       name: "Location",
-      selector: row => row.location.name,
+      selector: (row) => row.location.name,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -42,7 +43,7 @@ export default function Area() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -53,20 +54,17 @@ export default function Area() {
     },
   ];
 
-  const getArea = async page => {
+  const getArea = async (page) => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const areaData = await http.get(
-        `area/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(areaData)
+      const areaData = await http.get(`area/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(areaData);
       setTotalRows(areaData.length);
       setData(areaData);
     } catch (error) {
@@ -80,7 +78,7 @@ export default function Area() {
     getArea(1);
   }, [perPage]);
 
-  const deleteArea = async id => {
+  const deleteArea = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`area/${id}/`, {
@@ -93,11 +91,11 @@ export default function Area() {
     }
   };
 
-  const handlePageChange = async page => {
+  const handlePageChange = async (page) => {
     await getArea(page);
   };
 
-  const handlePerRowsChange = async newPerPage => {
+  const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
@@ -109,7 +107,7 @@ export default function Area() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteArea(id);
   };
 

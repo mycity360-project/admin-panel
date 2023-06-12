@@ -1,12 +1,13 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
 import moment from "moment/moment";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 import { Checkbox } from "../components/checkbox";
+import Grid from "../components/Grid";
 
 export default function AllAds() {
   const [data, setData] = useState([]);
@@ -20,33 +21,33 @@ export default function AllAds() {
     },
     {
       name: "Code",
-      selector: row => row.code,
+      selector: (row) => row.code,
     },
     {
       name: "Title",
-      selector: row => row.name,
+      selector: (row) => row.name,
     },
     {
       name: "Price",
-      selector: row => row.price,
+      selector: (row) => row.price,
     },
     {
       name: "Area",
-      selector: row => row.area.name,
+      selector: (row) => row.area.name,
     },
     {
       name: "Published On",
-      selector: row => moment(row.created_date).format("DD MMM YYYY"),
+      selector: (row) => moment(row.created_date).format("DD MMM YYYY"),
       compact: true,
     },
     {
       name: "Deleted",
-      cell: row => <Checkbox value={!row.is_active} isDisabled={true}/>,
+      cell: (row) => <Checkbox value={!row.is_active} isDisabled={true} />,
       compact: true,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -58,7 +59,7 @@ export default function AllAds() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -69,34 +70,37 @@ export default function AllAds() {
     },
   ];
 
-  const getUserAds = useCallback(async page => {
-    // setLoading(true);
+  const getUserAds = useCallback(
+    async (page) => {
+      // setLoading(true);
 
-    try {
-      const token = LocalStorage.getData("token");
-      const userAds = await http.get(
-        `user-ad/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setTotalRows(userAds.count);
-      setData(userAds.results);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  }, [perPage]);
+      try {
+        const token = LocalStorage.getData("token");
+        const userAds = await http.get(
+          `user-ad/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTotalRows(userAds.count);
+        setData(userAds.results);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     console.log("User Effect called");
     getUserAds(1);
   }, [getUserAds]);
 
-  const deleteUserAd = async id => {
+  const deleteUserAd = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`user-ad/${id}/`, {
@@ -109,11 +113,11 @@ export default function AllAds() {
     }
   };
 
-  const handlePageChange = async page => {
+  const handlePageChange = async (page) => {
     await getUserAds(page);
   };
 
-  const handlePerRowsChange = async newPerPage => {
+  const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
 
@@ -125,13 +129,13 @@ export default function AllAds() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteUserAd(id);
   };
 
   return (
     <div>
-      <NavigationBar />
+      {/* <NavigationBar />
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
@@ -144,7 +148,8 @@ export default function AllAds() {
           handleAdd={handleAdd}
           handleDelete={handleDelete}
         />
-      </div>
+      </div> */}
+      <Grid />
     </div>
   );
 }

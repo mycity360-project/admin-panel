@@ -11,6 +11,7 @@ import { MdModeEditOutline, MdDelete } from "react-icons/md";
 export default function Service() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   //   const [loading, setLoading] = useState(false);
 
@@ -62,19 +63,16 @@ export default function Service() {
     },
   ];
 
-  const getService = async (page) => {
+  const getService = async () => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const services = await http.get(
-        `service/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const services = await http.get(`service/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setTotalRows(services.length);
       setData(services);
     } catch (error) {
@@ -85,8 +83,8 @@ export default function Service() {
   };
 
   useEffect(() => {
-    getService(1);
-  }, [perPage]);
+    getService();
+  }, []);
 
   const deleteCategory = async (id) => {
     try {
@@ -99,14 +97,6 @@ export default function Service() {
     } catch (error) {
       console.log(error, "165");
     }
-  };
-
-  const handlePageChange = async (page) => {
-    await getService(page);
-  };
-
-  const handlePerRowsChange = async (newPerPage) => {
-    setPerPage(newPerPage);
   };
 
   const handleAdd = () => {
@@ -127,14 +117,11 @@ export default function Service() {
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Category"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={false}
         />
       </div>
     </div>

@@ -12,6 +12,7 @@ import { Checkbox } from "../components/checkbox";
 export default function Questions() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
@@ -24,12 +25,12 @@ export default function Questions() {
       selector: (row) => row.question,
     },
     {
-        name: "Feild Type",
-        selector: (row) => row.field_type,
-      },
+      name: "Feild Type",
+      selector: (row) => row.field_type,
+    },
     {
       name: "Required",
-      cell: (row) => <Checkbox value={row.is_required} isDisabled={true}/>,
+      cell: (row) => <Checkbox value={row.is_required} isDisabled={true} />,
       selector: (row) => row.is_required,
     },
     {
@@ -38,8 +39,8 @@ export default function Questions() {
       compact: true,
     },
     {
-        name: "Category/Sub-category",
-        selector: (row) => row.category.id,
+      name: "Category/Sub-category",
+      selector: (row) => row.category.id,
     },
     {
       name: "Action",

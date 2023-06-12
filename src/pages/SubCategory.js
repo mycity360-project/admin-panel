@@ -10,6 +10,7 @@ import { MdModeEditOutline, MdDelete } from "react-icons/md";
 export default function SubCategory() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   //   const [loading, setLoading] = useState(false);
 
