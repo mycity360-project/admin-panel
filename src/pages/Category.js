@@ -7,7 +7,6 @@ import { Image } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
-import * as Yup from "yup";
 import { Checkbox } from "../components/checkbox";
 
 export default function Category() {
@@ -17,38 +16,33 @@ export default function Category() {
   const [totalRows, setTotalRows] = useState(0);
   const [showForm, setShowForm] = useState(false);
 
-  const fields = [
+  const addFormFeilds = [
     {
       name: "Name",
       label: "Name",
       type: "text",
-      validation: Yup.string().required("Name is required"),
       defaultValue: 0,
     },
     {
       name: "Icon",
       label: "Icon",
       type: "file",
-      validation: Yup.string().required("Icon is required"),
     },
     {
       name: "Price Limit",
       label: "Price Limit",
       type: "number",
       defaultValue: 0,
-      validation: Yup.string().required("Price Limit is required"),
     },
     {
       name: "Is Price Required",
       label: "Is Price Required",
       type: "checkbox",
-      validation: Yup.string().required("Price is required"),
     },
     {
       name: "Phone",
       label: "Phone",
       type: "text",
-      validation: Yup.string().required("Phone is required"),
     },
   ];
 
@@ -90,7 +84,7 @@ export default function Category() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => handleEdit(row.id)}
             cursor="pointer"
           />
           <MdDelete
@@ -202,10 +196,11 @@ export default function Category() {
           handleDelete={handleDelete}
           handleToggleModal={handleToggleModal}
           showForm={showForm}
-          fields={fields}
+          fields={addFormFeilds}
           modalHeading={"Add Category"}
           handleFormSubmit={handleFormSubmit}
           isRemote={true}
+          isAddFormVisisble={true}
         />
       </div>
     </div>

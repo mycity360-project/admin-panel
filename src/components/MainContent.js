@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Container } from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import FormModal from "./FormModal";
 export const MainContent = ({
@@ -14,20 +14,23 @@ export const MainContent = ({
   fields,
   modalHeading,
   handleFormSubmit,
+  isAddFormVisisble,
 }) => {
   return (
     <Container className="main-content main-style">
+        {isAddFormVisisble && (
       <div className="row">
-        <div className="col-md-12 d-flex justify-content-end">
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => handleToggleModal()}
-          >
-            Add
-          </Button>
-        </div>
+          <div className="col-md-12 d-flex justify-content-end">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleToggleModal()}
+            >
+              Add
+            </Button>
+          </div>
       </div>
+        )}
 
       <DataTable
         data={data}
@@ -47,6 +50,7 @@ export const MainContent = ({
             },
           },
         }}
+        paginationRowsPerPageOptions={[10, 15]}
       />
       {showForm && (
         <FormModal

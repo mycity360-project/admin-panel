@@ -116,6 +116,7 @@ export default function AllAds() {
 
   const handlePageChange = async (page) => {
     setCurrentPage(page);
+    await getUserAds(page)
   };
 
   const handlePerRowsChange = async (newPerPage) => {
