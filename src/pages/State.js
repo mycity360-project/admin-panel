@@ -11,12 +11,12 @@ export default function State() {
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [totalRows, setTotalRows] = useState(0);
-
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
@@ -47,7 +47,7 @@ export default function State() {
     },
   ];
 
-  const getStates = async (page) => {
+  const getStates = async () => {
     // setLoading(true);
 
     try {
@@ -57,8 +57,7 @@ export default function State() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(stateData);
-      setTotalRows(stateData.length);
+
       setData(stateData);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -68,8 +67,8 @@ export default function State() {
   };
 
   useEffect(() => {
-    getStates(1);
-  }, [perPage]);
+    getStates();
+  }, []);
 
   const deleteState = async (id) => {
     try {
@@ -84,13 +83,13 @@ export default function State() {
     }
   };
 
-  const handlePageChange = async (page) => {
-    await getStates(page);
-  };
+   const handlePageChange = async (page) => {
+     setCurrentPage(page);
+   };
 
-  const handlePerRowsChange = async (newPerPage) => {
-    setPerPage(newPerPage);
-  };
+   const handlePerRowsChange = async (newPerPage) => {
+     setPerPage(newPerPage);
+   };
 
   const handleAdd = () => {
     console.log("add");
@@ -113,11 +112,11 @@ export default function State() {
           title="Area"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
+          isRemote={false}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
         />
       </div>
     </div>

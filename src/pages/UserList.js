@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -16,7 +16,9 @@ export default function UserList() {
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Email",
@@ -68,31 +70,34 @@ export default function UserList() {
     },
   ];
 
-  const getUserList = async (page) => {
-    // setLoading(true);
+  const getUserList = useCallback(
+    async (page) => {
+      // setLoading(true);
 
-    try {
-      const token = LocalStorage.getData("token");
-      const userList = await http.get(
-        `user/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setTotalRows(userList.count);
-      setData(userList.results);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+      try {
+        const token = LocalStorage.getData("token");
+        const userList = await http.get(
+          `user/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTotalRows(userList.count);
+        setData(userList.results);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     getUserList(1);
-  }, [perPage]);
+  }, [getUserList]);
 
   const deleteArea = async (id) => {
     try {
@@ -108,6 +113,7 @@ export default function UserList() {
   };
 
   const handlePageChange = async (page) => {
+    setCurrentPage(page);
     await getUserList(page);
   };
 
@@ -141,6 +147,7 @@ export default function UserList() {
           handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={true}
         />
       </div>
     </div>

@@ -34,7 +34,7 @@ export const MainContent = ({
         columns={columns}
         dense={true}
         striped={true}
-        pagination={isRemote}
+        pagination
         paginationServer={isRemote}
         paginationTotalRows={totalRows}
         onChangeRowsPerPage={handlePerRowsChange}

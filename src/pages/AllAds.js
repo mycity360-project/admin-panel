@@ -7,17 +7,19 @@ import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
 import { Checkbox } from "../components/checkbox";
-import Grid from "../components/Grid";
 
 export default function AllAds() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Code",
@@ -96,7 +98,6 @@ export default function AllAds() {
   );
 
   useEffect(() => {
-    console.log("User Effect called");
     getUserAds(1);
   }, [getUserAds]);
 
@@ -114,7 +115,7 @@ export default function AllAds() {
   };
 
   const handlePageChange = async (page) => {
-    await getUserAds(page);
+    setCurrentPage(page);
   };
 
   const handlePerRowsChange = async (newPerPage) => {
@@ -135,7 +136,7 @@ export default function AllAds() {
 
   return (
     <div>
-      {/* <NavigationBar />
+      <NavigationBar />
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
@@ -147,9 +148,9 @@ export default function AllAds() {
           handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={true}
         />
-      </div> */}
-      <Grid />
+      </div>
     </div>
   );
 }

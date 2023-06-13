@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -18,7 +18,9 @@ export default function Banners() {
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Area",
@@ -63,41 +65,35 @@ export default function Banners() {
     },
   ];
 
-  const getBanners = async (page) => {
-    // setLoading(true);
+  const getBanners = useCallback(
+    async (page) => {
+      // setLoading(true);
 
-    try {
-      const token = LocalStorage.getData("token");
-      const bannerResp = await http.get(
-        `banner/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const categories = bannerResp.results.map((category) => ({
-        id: category.id.toString(),
-        name: category.name,
-        icon: category.icon,
-        seq: category.sequence,
-        isPrice: category.is_price,
-        created_on: category.created_date,
-        price_limit: category.price_limit,
-      }));
+      try {
+        const token = LocalStorage.getData("token");
+        const bannerResp = await http.get(
+          `banner/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setTotalRows(bannerResp.count);
-      setData(bannerResp.results);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+        setTotalRows(bannerResp.count);
+        setData(bannerResp.results);
+      } catch (error) {
+        console.log(JSON.stringify(error));
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     getBanners(1);
-  }, [perPage]);
+  }, [getBanners]);
 
   const deleteCategory = async (id) => {
     try {
@@ -113,6 +109,7 @@ export default function Banners() {
   };
 
   const handlePageChange = async (page) => {
+    setCurrentPage(page);
     await getBanners(page);
   };
 
@@ -145,6 +142,7 @@ export default function Banners() {
           handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={true}
         />
       </div>
     </div>

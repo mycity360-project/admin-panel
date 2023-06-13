@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -108,39 +108,42 @@ export default function Category() {
     },
   ];
 
-  const getCategories = async (page) => {
-    try {
-      const token = LocalStorage.getData("token");
-      const categoriesRespData = await http.get(
-        `category/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const categories = categoriesRespData.results.map((category) => ({
-        id: category.id.toString(),
-        name: category.name,
-        icon: category.icon,
-        seq: category.sequence,
-        isPrice: category.is_price,
-        created_on: category.created_date,
-        price_limit: category.price_limit,
-      }));
+  const getCategories = useCallback(
+    async (page) => {
+      try {
+        const token = LocalStorage.getData("token");
+        const categoriesRespData = await http.get(
+          `category/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const categories = categoriesRespData.results.map((category) => ({
+          id: category.id.toString(),
+          name: category.name,
+          icon: category.icon,
+          seq: category.sequence,
+          isPrice: category.is_price,
+          created_on: category.created_date,
+          price_limit: category.price_limit,
+        }));
 
-      setTotalRows(categoriesRespData.count);
-      setData(categories);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+        setTotalRows(categoriesRespData.count);
+        setData(categories);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     getCategories(1);
-  }, [perPage]);
+  }, [getCategories]);
 
   const deleteCategory = async (id) => {
     try {
@@ -202,6 +205,7 @@ export default function Category() {
           fields={fields}
           modalHeading={"Add Category"}
           handleFormSubmit={handleFormSubmit}
+          isRemote={true}
         />
       </div>
     </div>

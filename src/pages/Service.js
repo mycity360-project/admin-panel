@@ -12,13 +12,15 @@ export default function Service() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRows, setTotalRows] = useState(0);
+
   //   const [loading, setLoading] = useState(false);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
@@ -73,7 +75,7 @@ export default function Service() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTotalRows(services.length);
+
       setData(services);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -111,6 +113,13 @@ export default function Service() {
     await deleteCategory(id);
   };
 
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+  };
+  const handlePerRowsChange = async (newPerPage) => {
+    setPerPage(newPerPage);
+  };
+
   return (
     <div>
       <NavigationBar />
@@ -121,6 +130,8 @@ export default function Service() {
           columns={columns}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
           isRemote={false}
         />
       </div>

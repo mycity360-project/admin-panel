@@ -10,12 +10,13 @@ export default function Area() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
@@ -54,7 +55,7 @@ export default function Area() {
     },
   ];
 
-  const getArea = async (page) => {
+  const getArea = async () => {
     // setLoading(true);
 
     try {
@@ -64,8 +65,7 @@ export default function Area() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(areaData);
-      setTotalRows(areaData.length);
+
       setData(areaData);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -75,8 +75,8 @@ export default function Area() {
   };
 
   useEffect(() => {
-    getArea(1);
-  }, [perPage]);
+    getArea();
+  }, []);
 
   const deleteArea = async (id) => {
     try {
@@ -91,14 +91,6 @@ export default function Area() {
     }
   };
 
-  const handlePageChange = async (page) => {
-    await getArea(page);
-  };
-
-  const handlePerRowsChange = async (newPerPage) => {
-    setPerPage(newPerPage);
-  };
-
   const handleAdd = () => {
     console.log("add");
   };
@@ -111,6 +103,14 @@ export default function Area() {
     await deleteArea(id);
   };
 
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePerRowsChange = async (newPerPage) => {
+    setPerPage(newPerPage);
+  };
+
   return (
     <div>
       <NavigationBar />
@@ -120,11 +120,11 @@ export default function Area() {
           title="Area"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
+          isRemote={false}
         />
       </div>
     </div>
