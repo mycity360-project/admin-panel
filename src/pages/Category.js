@@ -18,30 +18,31 @@ export default function Category() {
 
   const addFormFeilds = [
     {
-      name: "Name",
+      name: "name",
       label: "Name",
       type: "text",
     },
     {
-      name: "Icon",
+      name: "icon",
       label: "Icon",
       type: "file",
     },
     {
-      name: "Price Limit",
+      name: "price_limit",
       label: "Price Limit",
       type: "number",
       defaultValue: 0,
     },
     {
-      name: "Is Price Required",
+      name: "is_price_required",
       label: "Is Price Required",
       type: "checkbox",
+      defaultValue: false,
     },
     {
-      name: "Phone",
+      name: "phone",
       label: "Phone",
-      type: "text",
+      type: "number",
     },
   ];
 
@@ -175,9 +176,57 @@ export default function Category() {
     setShowForm(!showForm);
   };
 
-  const handleFormSubmit = (event, val) => {
+  const uploadIcon = async (file, id) => {
+    try {
+      const iconData = new FormData();
+
+      iconData.append("file", file);
+
+      const token = LocalStorage.getData("token");
+
+      const url = `category/icon/${id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+      const resp = await http.post(url, iconData, config);
+      console.log(resp, "199");
+    } catch (error) {
+      console.log(error, "201");
+    }
+  };
+
+  const createCategoryHandler = async (values) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = "category/";
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+      const data = {
+        name: values.name,
+        phone: values.phone,
+        is_price: values.is_price_required,
+        price_limit: values.price_limit,
+      };
+      const resp = await http.post(url, data, config);
+      return resp;
+    } catch (error) {
+      console.log(error, "223");
+    }
+  };
+
+  const handleAddCategory = async (event, values) => {
     event.preventDefault();
-    console.log(event);
+    console.log("hi", values);
+    const resp = await createCategoryHandler(values);
+    resp && (await uploadIcon(values.icon, resp.id));
+    setShowForm(false);
   };
 
   return (
@@ -197,7 +246,7 @@ export default function Category() {
           showForm={showForm}
           fields={addFormFeilds}
           modalHeading={"Add Category"}
-          handleFormSubmit={handleFormSubmit}
+          handleAddCategory={handleAddCategory}
           isRemote={true}
           isAddFormVisisble={true}
         />

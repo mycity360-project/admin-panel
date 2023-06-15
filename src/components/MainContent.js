@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Container} from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import FormModal from "./FormModal";
 export const MainContent = ({
@@ -13,13 +13,13 @@ export const MainContent = ({
   showForm,
   fields,
   modalHeading,
-  handleFormSubmit,
+  handleAddCategory,
   isAddFormVisisble,
 }) => {
   return (
     <Container className="main-content main-style">
-        {isAddFormVisisble && (
-      <div className="row">
+      {isAddFormVisisble && (
+        <div className="row">
           <div className="col-md-12 d-flex justify-content-end">
             <Button
               variant="primary"
@@ -29,8 +29,8 @@ export const MainContent = ({
               Add
             </Button>
           </div>
-      </div>
-        )}
+        </div>
+      )}
 
       <DataTable
         data={data}
@@ -58,7 +58,7 @@ export const MainContent = ({
           onHide={() => handleToggleModal()}
           fields={fields}
           modalHeading={modalHeading}
-          handleSubmit={handleFormSubmit}
+          handleAddCategory={handleAddCategory}
         />
       )}
     </Container>
