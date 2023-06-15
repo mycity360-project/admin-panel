@@ -13,12 +13,12 @@ export const MainContent = ({
   showForm,
   fields,
   modalHeading,
-  handleAddCategory,
-  isAddFormVisisble,
+  handleAdd,
+  isAddFormVisible,
 }) => {
   return (
     <Container className="main-content main-style">
-      {isAddFormVisisble && (
+      {isAddFormVisible && (
         <div className="row">
           <div className="col-md-12 d-flex justify-content-end">
             <Button
@@ -58,7 +58,7 @@ export const MainContent = ({
           onHide={() => handleToggleModal()}
           fields={fields}
           modalHeading={modalHeading}
-          handleAddCategory={handleAddCategory}
+          handleAdd={handleAdd}
         />
       )}
     </Container>

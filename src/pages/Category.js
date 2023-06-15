@@ -84,7 +84,7 @@ export default function Category() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit(row.id)}
+            onClick={() => handleEdit(row)}
             cursor="pointer"
           />
           <MdDelete
@@ -115,7 +115,7 @@ export default function Category() {
           }
         );
         const categories = categoriesRespData.results.map((category) => ({
-          id: category.id.toString(),
+          id: category.id,
           name: category.name,
           icon: category.icon,
           seq: category.sequence,
@@ -161,8 +161,8 @@ export default function Category() {
     setPerPage(newPerPage);
   };
 
-  const handleEdit = () => {
-    console.log("edit");
+  const handleEdit = (values) => {
+    console.log("edit", values);
   };
 
   const handleDelete = async (id) => {
@@ -199,7 +199,7 @@ export default function Category() {
     }
   };
 
-  const createCategoryHandler = async (values) => {
+  const createCategory = async (values) => {
     try {
       const token = LocalStorage.getData("token");
       const url = "category/";
@@ -221,10 +221,10 @@ export default function Category() {
     }
   };
 
-  const handleAddCategory = async (event, values) => {
+  const handleAdd = async (event, values) => {
     event.preventDefault();
     console.log("hi", values);
-    const resp = await createCategoryHandler(values);
+    const resp = await createCategory(values);
     resp && (await uploadIcon(values.icon, resp.id));
     setShowForm(false);
   };
@@ -246,9 +246,9 @@ export default function Category() {
           showForm={showForm}
           fields={addFormFeilds}
           modalHeading={"Add Category"}
-          handleAddCategory={handleAddCategory}
+          handleAdd={handleAdd}
           isRemote={true}
-          isAddFormVisisble={true}
+          isAddFormVisible={true}
         />
       </div>
     </div>

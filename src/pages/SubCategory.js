@@ -12,7 +12,19 @@ export default function SubCategory() {
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
+  const [showForm, setShowForm] = useState(false);
+  const [categories, setCategories] = useState([]);
   //   const [loading, setLoading] = useState(false);
+
+  const addFormFeilds = [
+    {
+      name: "category",
+      label: "Category",
+      type: "dropdown",
+      options: categories,
+    },
+    { name: "name", label: "Name", type: "text" },
+  ];
 
   const columns = [
     {
@@ -91,6 +103,33 @@ export default function SubCategory() {
     getSubCategories(1);
   }, [getSubCategories]);
 
+  const getCategories = async () => {
+    try {
+      const token = LocalStorage.getData("token");
+      const categoriesRespData = await http.get(
+        `category/?page=1&page_size=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const categories = categoriesRespData.results.map((category) => ({
+        id: category.id,
+        name: category.name,
+      }));
+      setCategories(categories);
+    } catch (error) {
+      console.log(error, "145");
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   const deleteSubCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
@@ -113,18 +152,56 @@ export default function SubCategory() {
     setPerPage(newPerPage);
   };
 
-  const handleAdd = () => {
-    console.log("add");
-  };
-
   const handleEdit = () => {
     console.log("edit");
   };
 
   const handleDelete = async (id) => {
-    await deleteSubCategory(id);
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteSubCategory(id);
+    }
   };
 
+  const handleToggleModal = () => {
+    setShowForm(!showForm);
+  };
+
+  const createSubCategory = async (values) => {
+    try {
+      const token = LocalStorage.getData("token");
+      console.log("218");
+      const url = "category/";
+      console.log("219");
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+      console.log("224");
+      const data = {
+        category_id: values.category,
+        name: values.name,
+        phone: values.phone,
+        is_price: values.is_price_required,
+        price_limit: values.price_limit,
+      };
+      console.log("234");
+      const resp = await http.post(url, data, config);
+      console.log("236");
+
+      return resp;
+    } catch (error) {
+      console.log(error, "223");
+    }
+  };
+
+  const handleAdd = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    await createSubCategory(values);
+    setShowForm(false);
+  };
   return (
     <div>
       <NavigationBar />
@@ -137,9 +214,14 @@ export default function SubCategory() {
           totalRows={totalRows}
           handlePageChange={handlePageChange}
           handlePerRowsChange={handlePerRowsChange}
-          handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handleToggleModal={handleToggleModal}
           isRemote={true}
+          isAddFormVisible={true}
+          showForm={showForm}
+          fields={addFormFeilds}
+          modalHeading={"Add Sub Category"}
+          handleAdd={handleAdd}
         />
       </div>
     </div>

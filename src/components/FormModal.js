@@ -1,17 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
-const FormModal = ({
-  show,
-  onHide,
-  fields,
-  modalHeading,
-  handleAddCategory,
-}) => {
+const FormModal = ({ show, onHide, fields, modalHeading, handleAdd }) => {
   const initialValues = {};
   const validationSchema = {};
+  const [selectedOption, setSelectedOption] = useState("");
 
   // Component for rendering text fields
   const TextField = ({
@@ -25,6 +20,7 @@ const FormModal = ({
     <>
       <Form.Label>{field.label}</Form.Label>
       <Form.Control
+        size="sm"
         type={field.type}
         name={field.name}
         value={values[field.name]}
@@ -41,6 +37,7 @@ const FormModal = ({
   // Component for rendering checkbox fields
   const CheckboxField = ({ field, values, handleChange, handleBlur }) => (
     <Form.Check
+      size="sm"
       type={field.type}
       label={field.label}
       inline
@@ -54,21 +51,47 @@ const FormModal = ({
     <>
       <Form.Label>{field.label}</Form.Label>
       <Form.Control
+        size="sm"
         type={field.type}
         name={field.name}
         onChange={(event) => {
           const file = event.target.files[0];
-          setFieldValue("icon", file);
+          setFieldValue(`${field.name}`, file);
         }}
         accept="image/*"
       />
     </>
   );
 
+  const Dropdown = ({ field, setFieldValue }) => (
+    <Form.Select
+      id={field.name}
+      size="sm"
+      onChange={(event) => handleOptionSelect(event, field, setFieldValue)}
+      value={selectedOption ? selectedOption.id : ""}
+    >
+      <option value="">Select {field.label}</option>
+      {field.options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.name}
+        </option>
+      ))}
+    </Form.Select>
+  );
+
   fields.forEach((field) => {
     initialValues[field.name] = field.defaultValue ?? "";
     validationSchema[field.name] = field.validation;
   });
+
+  const handleOptionSelect = (event, field, setFieldValue) => {
+    const selectedId = event.target.value;
+    const selectedOption = field.options.find(
+      (option) => option.id === parseInt(selectedId)
+    );
+    setSelectedOption(selectedOption);
+    setFieldValue(`${field.name}`, parseInt(selectedId));
+  };
 
   const renderField = (
     field,
@@ -80,7 +103,7 @@ const FormModal = ({
     setFieldValue
   ) => {
     switch (field.type) {
-      case "checkbox":
+      case "checkbox": {
         return (
           <CheckboxField
             field={field}
@@ -88,7 +111,8 @@ const FormModal = ({
             handleChange={handleChange}
           />
         );
-      case "file":
+      }
+      case "file": {
         return (
           <IconField
             field={field}
@@ -98,6 +122,10 @@ const FormModal = ({
             setFieldValue={setFieldValue}
           />
         );
+      }
+      case "dropdown": {
+        return <Dropdown field={field} setFieldValue={setFieldValue} />;
+      }
       default: {
         return (
           <TextField
@@ -132,7 +160,7 @@ const FormModal = ({
             handleSubmit,
             setFieldValue,
           }) => (
-            <Form onSubmit={(event) => handleAddCategory(event, values)}>
+            <Form onSubmit={(event) => handleAdd(event, values)}>
               {fields.map((field) => (
                 <Form.Group
                   controlId={field.name}
