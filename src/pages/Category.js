@@ -21,7 +21,6 @@ export default function Category() {
       name: "Name",
       label: "Name",
       type: "text",
-      defaultValue: 0,
     },
     {
       name: "Icon",
