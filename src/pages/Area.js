@@ -1,36 +1,38 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 
 export default function Area() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
-      selector: row => row.name,
+      selector: (row) => row.name,
     },
     {
       name: "Pin Code",
-      selector: row => row.pincode,
+      selector: (row) => row.pincode,
     },
     {
       name: "Location",
-      selector: row => row.location.name,
+      selector: (row) => row.location.name,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -42,7 +44,7 @@ export default function Area() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -53,21 +55,17 @@ export default function Area() {
     },
   ];
 
-  const getArea = async page => {
+  const getArea = async () => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const areaData = await http.get(
-        `area/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(areaData)
-      setTotalRows(areaData.length);
+      const areaData = await http.get(`area/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setData(areaData);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -77,10 +75,10 @@ export default function Area() {
   };
 
   useEffect(() => {
-    getArea(1);
-  }, [perPage]);
+    getArea();
+  }, []);
 
-  const deleteArea = async id => {
+  const deleteArea = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`area/${id}/`, {
@@ -93,14 +91,6 @@ export default function Area() {
     }
   };
 
-  const handlePageChange = async page => {
-    await getArea(page);
-  };
-
-  const handlePerRowsChange = async newPerPage => {
-    setPerPage(newPerPage);
-  };
-
   const handleAdd = () => {
     console.log("add");
   };
@@ -109,8 +99,16 @@ export default function Area() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteArea(id);
+  };
+
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePerRowsChange = async (newPerPage) => {
+    setPerPage(newPerPage);
   };
 
   return (
@@ -122,11 +120,11 @@ export default function Area() {
           title="Area"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
+          isRemote={false}
         />
       </div>
     </div>

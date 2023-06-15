@@ -19,10 +19,10 @@ import {
   UserList,
   SubCategory,
   Questions,
-  Login
-} from "./pages"
+  Login,
+} from "./pages";
+import Home from "./pages/Home";
 import "./App.css";
-
 
 function App() {
   const token = LocalStorage.getData("token");

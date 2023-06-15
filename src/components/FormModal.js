@@ -37,7 +37,11 @@ const FormModal = ({ show, onHide, fields, modalHeading }) => {
           }) => (
             <Form onSubmit={handleSubmit}>
               {fields.map((field) => (
-                <Form.Group controlId={field.name} key={field.name}>
+                <Form.Group
+                  controlId={field.name}
+                  key={field.name}
+                  style={{ padding: 5 }}
+                >
                   {field.type !== "checkbox" ? (
                     <>
                       <Form.Label>{field.label}</Form.Label>
@@ -58,7 +62,7 @@ const FormModal = ({ show, onHide, fields, modalHeading }) => {
                       label={field.name}
                       id="default-checkbox"
                       value={values[field.name]}
-                      defaultValue={field.defaultValue}
+                      s
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />

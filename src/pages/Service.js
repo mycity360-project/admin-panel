@@ -11,13 +11,16 @@ import { MdModeEditOutline, MdDelete } from "react-icons/md";
 export default function Service() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
   //   const [loading, setLoading] = useState(false);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
@@ -62,20 +65,17 @@ export default function Service() {
     },
   ];
 
-  const getService = async (page) => {
+  const getService = async () => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const services = await http.get(
-        `service/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setTotalRows(services.length);
+      const services = await http.get(`service/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setData(services);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -85,8 +85,8 @@ export default function Service() {
   };
 
   useEffect(() => {
-    getService(1);
-  }, [perPage]);
+    getService();
+  }, []);
 
   const deleteCategory = async (id) => {
     try {
@@ -101,14 +101,6 @@ export default function Service() {
     }
   };
 
-  const handlePageChange = async (page) => {
-    await getService(page);
-  };
-
-  const handlePerRowsChange = async (newPerPage) => {
-    setPerPage(newPerPage);
-  };
-
   const handleAdd = () => {
     console.log("add");
   };
@@ -121,20 +113,26 @@ export default function Service() {
     await deleteCategory(id);
   };
 
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+  };
+  const handlePerRowsChange = async (newPerPage) => {
+    setPerPage(newPerPage);
+  };
+
   return (
     <div>
       <NavigationBar />
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Category"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
+          isRemote={false}
         />
       </div>
     </div>

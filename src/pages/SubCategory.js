@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -10,13 +10,16 @@ import { MdModeEditOutline, MdDelete } from "react-icons/md";
 export default function SubCategory() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   //   const [loading, setLoading] = useState(false);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
 
     {
@@ -58,32 +61,35 @@ export default function SubCategory() {
     },
   ];
 
-  const getSubCategories = async (page) => {
-    // setLoading(true);
+  const getSubCategories = useCallback(
+    async (page) => {
+      // setLoading(true);
 
-    try {
-      const token = LocalStorage.getData("token");
-      const categoriesRespData = await http.get(
-        `sub-category/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      try {
+        const token = LocalStorage.getData("token");
+        const categoriesRespData = await http.get(
+          `sub-category/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setTotalRows(categoriesRespData.count);
-      setData(categoriesRespData.results);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+        setTotalRows(categoriesRespData.count);
+        setData(categoriesRespData.results);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     getSubCategories(1);
-  }, [perPage]);
+  }, [getSubCategories]);
 
   const deleteSubCategory = async (id) => {
     try {
@@ -99,6 +105,7 @@ export default function SubCategory() {
   };
 
   const handlePageChange = async (page) => {
+    setCurrentPage(page);
     await getSubCategories(page);
   };
 
@@ -132,6 +139,7 @@ export default function SubCategory() {
           handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={true}
         />
       </div>
     </div>

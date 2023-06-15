@@ -5,7 +5,7 @@
   left: 0;
   min-height: 100vh !important;
   z-index: 100;
-  padding: 48px 0 0;
+  /* padding: 48px 0 0; */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 #sidebar-wrapper {
@@ -24,9 +24,16 @@
 .main-style {
   height: calc(100vh-50px);
   margin-top: 60px;
+  position: relative;
 }
 
 #page-content-wrapper {
   min-width: 0;
   width: 100%;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

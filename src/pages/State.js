@@ -1,28 +1,30 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
-import {LocalStorage} from "../shared/lib";
-import {http} from "../shared/lib";
-import {MainContent} from "../components/MainContent";
-import {MdModeEditOutline, MdDelete} from "react-icons/md";
+import { LocalStorage } from "../shared/lib";
+import { http } from "../shared/lib";
+import { MainContent } from "../components/MainContent";
+import { MdModeEditOutline, MdDelete } from "react-icons/md";
 
 export default function State() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "Name",
-      selector: row => row.name,
+      selector: (row) => row.name,
     },
     {
       name: "Action",
-      cell: row => (
+      cell: (row) => (
         <div className="text-center">
           <MdModeEditOutline
             color="#444"
@@ -34,7 +36,7 @@ export default function State() {
             color="#444"
             size={20}
             cursor="pointer"
-            style={{marginLeft: "10px"}}
+            style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
         </div>
@@ -45,21 +47,17 @@ export default function State() {
     },
   ];
 
-  const getStates = async page => {
+  const getStates = async () => {
     // setLoading(true);
 
     try {
       const token = LocalStorage.getData("token");
-      const stateData = await http.get(
-        `state/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(stateData)
-      setTotalRows(stateData.length);
+      const stateData = await http.get(`state/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setData(stateData);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -69,10 +67,10 @@ export default function State() {
   };
 
   useEffect(() => {
-    getStates(1);
-  }, [perPage]);
+    getStates();
+  }, []);
 
-  const deleteState = async id => {
+  const deleteState = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`state/${id}/`, {
@@ -85,13 +83,13 @@ export default function State() {
     }
   };
 
-  const handlePageChange = async page => {
-    await getStates(page);
-  };
+   const handlePageChange = async (page) => {
+     setCurrentPage(page);
+   };
 
-  const handlePerRowsChange = async newPerPage => {
-    setPerPage(newPerPage);
-  };
+   const handlePerRowsChange = async (newPerPage) => {
+     setPerPage(newPerPage);
+   };
 
   const handleAdd = () => {
     console.log("add");
@@ -101,7 +99,7 @@ export default function State() {
     console.log("edit");
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteState(id);
   };
 
@@ -114,11 +112,11 @@ export default function State() {
           title="Area"
           data={data}
           columns={columns}
-          totalRows={totalRows}
-          handlePageChange={handlePageChange}
-          handlePerRowsChange={handlePerRowsChange}
+          isRemote={false}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          handlePageChange={handlePageChange}
+          handlePerRowsChange={handlePerRowsChange}
         />
       </div>
     </div>

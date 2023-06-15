@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
 import { http } from "../shared/lib";
-import { Image } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
@@ -12,24 +11,27 @@ import { Checkbox } from "../components/checkbox";
 export default function Questions() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => (
+        <div>{(currentPage - 1) * perPage + (index + 1)}</div>
+      ),
     },
     {
       name: "question",
       selector: (row) => row.question,
     },
     {
-        name: "Feild Type",
-        selector: (row) => row.field_type,
-      },
+      name: "Feild Type",
+      selector: (row) => row.field_type,
+    },
     {
       name: "Required",
-      cell: (row) => <Checkbox value={row.is_required} isDisabled={true}/>,
+      cell: (row) => <Checkbox value={row.is_required} isDisabled={true} />,
       selector: (row) => row.is_required,
     },
     {
@@ -38,8 +40,8 @@ export default function Questions() {
       compact: true,
     },
     {
-        name: "Category/Sub-category",
-        selector: (row) => row.category.id,
+      name: "Category/Sub-category",
+      selector: (row) => row.category.id,
     },
     {
       name: "Action",
@@ -66,32 +68,35 @@ export default function Questions() {
     },
   ];
 
-  const getCategories = async (page) => {
-    // setLoading(true);
+  const getQuestions = useCallback(
+    async (page) => {
+      // setLoading(true);
 
-    try {
-      const token = LocalStorage.getData("token");
-      const questionResp = await http.get(
-        `question/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      try {
+        const token = LocalStorage.getData("token");
+        const questionResp = await http.get(
+          `question/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setTotalRows(questionResp.count);
-      setData(questionResp.results);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+        setTotalRows(questionResp.count);
+        setData(questionResp.results);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
-    getCategories(1);
-  }, [perPage]);
+    getQuestions(1);
+  }, [getQuestions]);
 
   const deleteCategory = async (id) => {
     try {
@@ -107,7 +112,8 @@ export default function Questions() {
   };
 
   const handlePageChange = async (page) => {
-    await getCategories(page);
+    setCurrentPage(page);
+    await getQuestions(page);
   };
 
   const handlePerRowsChange = async (newPerPage) => {
@@ -140,6 +146,7 @@ export default function Questions() {
           handlePerRowsChange={handlePerRowsChange}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
+          isRemote={true}
         />
       </div>
     </div>

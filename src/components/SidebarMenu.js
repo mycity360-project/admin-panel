@@ -1,7 +1,7 @@
 import React from "react";
-import {Link} from "react-router-dom";
-import {Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {theme} from "../shared/constants";
+import { Link } from "react-router-dom";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { theme } from "../shared/constants";
 
 const SidebarMenu = () => {
   return (
@@ -16,10 +16,11 @@ const SidebarMenu = () => {
         backgroundColor={theme.secondary_color}
         width="251px"
         fixed="left"
+        className="sidebar"
       >
         <Menu
           menuItemStyles={{
-            button: ({active, disabled}) => {
+            button: ({ active, disabled }) => {
               return {
                 color: active ? "#FF8C00" : "#FFF",
                 backgroundColor: active ? "#444" : undefined,

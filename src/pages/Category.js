@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -7,50 +7,51 @@ import { Image } from "react-bootstrap";
 import moment from "moment/moment";
 import { MainContent } from "../components/MainContent";
 import { MdModeEditOutline, MdDelete } from "react-icons/md";
-import * as Yup from "yup";
 import { Checkbox } from "../components/checkbox";
 
 export default function Category() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const [showForm, setShowForm] = useState(false);
 
-  const fields = [
-    // name is for formik , initialValues  and all...
-    // label is to show input field name on form
+  const addFormFeilds = [
     {
       name: "Name",
       label: "Name",
       type: "text",
-      validation: Yup.string().required("Name is required"),
       defaultValue: 0,
     },
     {
       name: "Icon",
       label: "Icon",
       type: "file",
-      validation: Yup.string().required("Icon is required"),
     },
     {
       name: "Price Limit",
       label: "Price Limit",
       type: "number",
       defaultValue: 0,
-      validation: Yup.string().required("Price Limit is required"),
     },
     {
-      name: "Price Required",
-      label: "Price Required",
+      name: "Is Price Required",
+      label: "Is Price Required",
       type: "checkbox",
-      validation: Yup.string().required("Name is required"),
+    },
+    {
+      name: "Phone",
+      label: "Phone",
+      type: "text",
     },
   ];
 
   const columns = [
     {
       name: "Sr No.",
-      cell: (row, index) => <div>{index + 1}</div>,
+      cell: (row, index) => {
+        return <div> {(currentPage - 1) * perPage + (index + 1)}</div>;
+      },
     },
 
     {
@@ -65,7 +66,7 @@ export default function Category() {
     },
     {
       name: "Price\nRequired ",
-      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true}/>,
+      cell: (row) => <Checkbox value={row.isPrice} isDisabled={true} />,
       selector: (row) => row.isPrice,
     },
     {
@@ -83,7 +84,7 @@ export default function Category() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => handleEdit(row.id)}
             cursor="pointer"
           />
           <MdDelete
@@ -101,44 +102,47 @@ export default function Category() {
     },
   ];
 
-  const getCategories = async (page) => {
-    try {
-      const token = LocalStorage.getData("token");
-      const categoriesRespData = await http.get(
-        `category/?page=${page}&page_size=${perPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const categories = categoriesRespData.results.map((category) => ({
-        id: category.id.toString(),
-        name: category.name,
-        icon: category.icon,
-        seq: category.sequence,
-        isPrice: category.is_price,
-        created_on: category.created_date,
-        price_limit: category.price_limit,
-      }));
+  const getCategories = useCallback(
+    async (page) => {
+      try {
+        const token = LocalStorage.getData("token");
+        const categoriesRespData = await http.get(
+          `category/?page=${page}&page_size=${perPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const categories = categoriesRespData.results.map((category) => ({
+          id: category.id.toString(),
+          name: category.name,
+          icon: category.icon,
+          seq: category.sequence,
+          isPrice: category.is_price,
+          created_on: category.created_date,
+          price_limit: category.price_limit,
+        }));
 
-      setTotalRows(categoriesRespData.count);
-      setData(categories);
-    } catch (error) {
-      console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
-    }
-  };
+        setTotalRows(categoriesRespData.count);
+        setData(categories);
+      } catch (error) {
+        console.log(JSON.stringify(error), 25);
+      } finally {
+        //   setLoading(false);
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
     getCategories(1);
-  }, [perPage]);
+  }, [getCategories]);
 
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
-      const respData = await http.delete(`category/${id}/`, {
+      await http.delete(`category/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -149,6 +153,7 @@ export default function Category() {
   };
 
   const handlePageChange = async (page) => {
+    setCurrentPage(page);
     await getCategories(page);
   };
 
@@ -171,6 +176,11 @@ export default function Category() {
     setShowForm(!showForm);
   };
 
+  const handleFormSubmit = (event, val) => {
+    event.preventDefault();
+    console.log(event);
+  };
+
   return (
     <div>
       <NavigationBar />
@@ -186,8 +196,11 @@ export default function Category() {
           handleDelete={handleDelete}
           handleToggleModal={handleToggleModal}
           showForm={showForm}
-          fields={fields}
+          fields={addFormFeilds}
           modalHeading={"Add Category"}
+          handleFormSubmit={handleFormSubmit}
+          isRemote={true}
+          isAddFormVisisble={true}
         />
       </div>
     </div>
