@@ -41,16 +41,26 @@ const CheckboxField = ({ field, values, handleChange, handleBlur }) => (
   />
 );
 
-const IconField = ({ field, values, handleChange }) => (
-  <Form.Control
-    type={field.type}
-    label={field.label}
-    value={values[field.name]}
-    onChange={(e) => {
-      console.log(e.currentTarget);
-    }}
-    accept="image/*"
-  />
+const IconField = ({ field, values }) => (
+  // <Form.Control
+  //   type={field.type}
+  //   label={field.label}
+  //   value={values[field.name]}
+  //   onChange={(e) => {
+  //     console.log(e.currentTarget, "50");
+  //   }}
+  //   accept="image/*"
+  // />
+  <div>
+    <label>{field.label}</label>
+    <input
+      name={field.label}
+      type={field.type}
+      onChange={(event) => {
+        console.log("image", event.currentTarget.files[0]);
+      }}
+    />
+  </div>
 );
 
 const FormModal = ({ show, onHide, fields, modalHeading }) => {
@@ -64,9 +74,6 @@ const FormModal = ({ show, onHide, fields, modalHeading }) => {
 
   const handleSubmit = (values) => {
     console.log("its me, form ", values);
-  };
-  const handleIconChange = () => {
-    console.log("45");
   };
 
   const renderField = (
@@ -87,7 +94,7 @@ const FormModal = ({ show, onHide, fields, modalHeading }) => {
           />
         );
       case "Icon":
-        return <IconField field={field} handleChange={handleChange} />;
+        return <IconField field={field} />;
       default: {
         return (
           <TextField
