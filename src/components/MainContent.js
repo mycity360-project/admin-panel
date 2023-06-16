@@ -3,6 +3,7 @@ import { Button, Container } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import FormModal from "./FormModal";
 export const MainContent = ({
+  title,
   data,
   columns,
   isRemote,
@@ -10,11 +11,13 @@ export const MainContent = ({
   handlePageChange,
   handlePerRowsChange,
   handleToggleModal,
+  setModalHeading,
   showForm,
   fields,
   modalHeading,
-  handleAdd,
+  formSubmitHandler,
   isAddFormVisible,
+  isFormEditCategory,
 }) => {
   return (
     <Container className="main-content main-style">
@@ -24,7 +27,10 @@ export const MainContent = ({
             <Button
               variant="primary"
               size="sm"
-              onClick={() => handleToggleModal()}
+              onClick={() => {
+                setModalHeading(`Add ${title}`);
+                handleToggleModal();
+              }}
             >
               Add
             </Button>
@@ -58,7 +64,8 @@ export const MainContent = ({
           onHide={() => handleToggleModal()}
           fields={fields}
           modalHeading={modalHeading}
-          handleAdd={handleAdd}
+          isFormEditCategory={isFormEditCategory}
+          formSubmitHandler={formSubmitHandler}
         />
       )}
     </Container>

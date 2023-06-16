@@ -15,8 +15,11 @@ export default function Category() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [modalHeading, setModalHeading] = useState("");
+  const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [editFormFields, setEditFormFields] = useState([]);
 
-  const addFormFeilds = [
+  const formFields = [
     {
       name: "name",
       label: "Name",
@@ -34,10 +37,10 @@ export default function Category() {
       defaultValue: 0,
     },
     {
-      name: "is_price_required",
+      name: "is_price",
       label: "Is Price Required",
       type: "checkbox",
-      defaultValue: false,
+      defaultValue: true,
     },
     {
       name: "phone",
@@ -84,7 +87,12 @@ export default function Category() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit(row)}
+            onClick={() => {
+              setModalHeading("Edit Category");
+              setIsFormEditCategory(true);
+              handleEditFormFields(row);
+              handleToggleModal();
+            }}
             cursor="pointer"
           />
           <MdDelete
@@ -119,9 +127,10 @@ export default function Category() {
           name: category.name,
           icon: category.icon,
           seq: category.sequence,
-          isPrice: category.is_price,
+          is_price: category.is_price,
           created_on: category.created_date,
           price_limit: category.price_limit,
+          phone: category.phone,
         }));
 
         setTotalRows(categoriesRespData.count);
@@ -161,19 +170,9 @@ export default function Category() {
     setPerPage(newPerPage);
   };
 
-  const handleEdit = (values) => {
-    console.log("edit", values);
-  };
-
-  const handleDelete = async (id) => {
-    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
-    if (shouldDelete) {
-      await deleteCategory(id);
-    }
-  };
-
   const handleToggleModal = () => {
     setShowForm(!showForm);
+    isFormEditCategory && setIsFormEditCategory(false);
   };
 
   const uploadIcon = async (file, id) => {
@@ -227,6 +226,30 @@ export default function Category() {
     const resp = await createCategory(values);
     resp && (await uploadIcon(values.icon, resp.id));
     setShowForm(false);
+    setModalHeading("");
+  };
+
+  const handleEdit = (event, values) => {
+    event.preventDefault();
+    console.log("edit", values);
+  };
+
+  const handleEditFormFields = (rowData) => {
+    const fields = formFields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(rowData, fields);
+    setEditFormFields(fields);
+  };
+
+  const handleDelete = async (id) => {
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteCategory(id);
+    }
   };
 
   return (
@@ -236,6 +259,7 @@ export default function Category() {
         <SidebarMenu />
         <MainContent
           title="Category"
+          modalHeading={modalHeading}
           data={data}
           columns={columns}
           totalRows={totalRows}
@@ -243,12 +267,13 @@ export default function Category() {
           handlePerRowsChange={handlePerRowsChange}
           handleDelete={handleDelete}
           handleToggleModal={handleToggleModal}
+          setModalHeading={setModalHeading}
           showForm={showForm}
-          fields={addFormFeilds}
-          modalHeading={"Add Category"}
-          handleAdd={handleAdd}
+          fields={isFormEditCategory ? editFormFields : formFields}
+          formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
           isRemote={true}
           isAddFormVisible={true}
+          isFormEditCategory={isFormEditCategory}
         />
       </div>
     </div>

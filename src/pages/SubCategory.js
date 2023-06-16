@@ -170,15 +170,13 @@ export default function SubCategory() {
   const createSubCategory = async (values) => {
     try {
       const token = LocalStorage.getData("token");
-      console.log("218");
       const url = "category/";
-      console.log("219");
       const config = {
         headers: {
           " Authorization": `Bearer ${token}`,
         },
       };
-      console.log("224");
+
       const data = {
         category_id: values.category,
         name: values.name,
@@ -186,9 +184,8 @@ export default function SubCategory() {
         is_price: values.is_price_required,
         price_limit: values.price_limit,
       };
-      console.log("234");
+
       const resp = await http.post(url, data, config);
-      console.log("236");
 
       return resp;
     } catch (error) {

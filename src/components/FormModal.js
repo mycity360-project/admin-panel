@@ -1,12 +1,20 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Row, Col, Button, Form, Image } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
-const FormModal = ({ show, onHide, fields, modalHeading, handleAdd }) => {
+const FormModal = ({
+  show,
+  onHide,
+  fields,
+  modalHeading,
+  formSubmitHandler,
+  isFormEditCategory,
+}) => {
   const initialValues = {};
   const validationSchema = {};
   const [selectedOption, setSelectedOption] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   // Component for rendering text fields
   const TextField = ({
@@ -44,22 +52,37 @@ const FormModal = ({ show, onHide, fields, modalHeading, handleAdd }) => {
       value={values[field.name]}
       onChange={handleChange}
       onBlur={handleBlur}
+      checked={values[field.name]}
     />
   );
 
-  const IconField = ({ field, setFieldValue }) => (
+  const IconField = ({ field, setFieldValue, values }) => (
     <>
       <Form.Label>{field.label}</Form.Label>
-      <Form.Control
-        size="sm"
-        type={field.type}
-        name={field.name}
-        onChange={(event) => {
-          const file = event.target.files[0];
-          setFieldValue(`${field.name}`, file);
-        }}
-        accept="image/*"
-      />
+      <Row>
+        <Col>
+          <Form.Control
+            size="sm"
+            type={field.type}
+            name={field.name}
+            onChange={(event) => {
+              const file = event.target.files[0];
+              setImageUrl(URL.createObjectURL(file));
+              setFieldValue(`${field.name}`, file);
+            }}
+            accept="image/*"
+            className="custom-file-input"
+          />
+        </Col>
+        <Col>
+          <Image
+            src={isFormEditCategory ? field.defaultValue : imageUrl}
+            width={35}
+            height={35}
+            rounded
+          />
+        </Col>
+      </Row>
     </>
   );
 
@@ -160,7 +183,7 @@ const FormModal = ({ show, onHide, fields, modalHeading, handleAdd }) => {
             handleSubmit,
             setFieldValue,
           }) => (
-            <Form onSubmit={(event) => handleAdd(event, values)}>
+            <Form onSubmit={(event) => formSubmitHandler(event, values)}>
               {fields.map((field) => (
                 <Form.Group
                   controlId={field.name}
