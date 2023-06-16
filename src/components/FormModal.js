@@ -74,14 +74,14 @@ const FormModal = ({
             className="custom-file-input"
           />
         </Col>
-        <Col>
+        {(field.defaultValue || imageUrl) && (<Col>
           <Image
             src={isFormEditCategory ? field.defaultValue : imageUrl}
             width={35}
             height={35}
             rounded
           />
-        </Col>
+        </Col>)}
       </Row>
     </>
   );
