@@ -10,11 +10,14 @@ const FormModal = ({
   modalHeading,
   formSubmitHandler,
   isFormEditCategory,
+  isSecondDropdown,
+  handleSecondDropdown,
 }) => {
   const initialValues = {};
   const validationSchema = {};
   const [selectedOption, setSelectedOption] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  // const [imageUrl, setImageUrl] = useState("");
+  const [isSecondDropdownCreated, setIsSecondDropdownCreated] = useState(false);
 
   // Component for rendering text fields
   const TextField = ({
@@ -67,31 +70,36 @@ const FormModal = ({
             name={field.name}
             onChange={(event) => {
               const file = event.target.files[0];
-              setImageUrl(URL.createObjectURL(file));
               setFieldValue(`${field.name}`, file);
             }}
             accept="image/*"
-            className="custom-file-input"
           />
         </Col>
-        {(field.defaultValue || imageUrl) && (<Col>
+
+        <Col>
           <Image
-            src={isFormEditCategory ? field.defaultValue : imageUrl}
+            src={
+              !isFormEditCategory
+                ? URL.createObjectURL(values[field.name])
+                : field.defaultValue
+            }
             width={35}
             height={35}
             rounded
           />
-        </Col>)}
+        </Col>
       </Row>
     </>
   );
 
-  const Dropdown = ({ field, setFieldValue }) => (
+  const Dropdown = ({ field, setFieldValue, handleSecondDropdown }) => (
     <Form.Select
       id={field.name}
       size="sm"
-      onChange={(event) => handleOptionSelect(event, field, setFieldValue)}
-      value={selectedOption ? selectedOption.id : ""}
+      onChange={(event) =>
+        handleOptionSelect(event, field, setFieldValue, handleSecondDropdown)
+      }
+      value={selectedOption ? selectedOption.id : field.defaultValue?.id}
     >
       <option value="">Select {field.label}</option>
       {field.options.map((option) => (
@@ -107,13 +115,22 @@ const FormModal = ({
     validationSchema[field.name] = field.validation;
   });
 
-  const handleOptionSelect = (event, field, setFieldValue) => {
+  const handleOptionSelect = (
+    event,
+    field,
+    setFieldValue,
+    handleSecondDropdown
+  ) => {
     const selectedId = event.target.value;
     const selectedOption = field.options.find(
       (option) => option.id === parseInt(selectedId)
     );
     setSelectedOption(selectedOption);
     setFieldValue(`${field.name}`, parseInt(selectedId));
+    if (isSecondDropdown) {
+      handleSecondDropdown(selectedId);
+      //setIsSecondDropdownCreated(true);
+    }
   };
 
   const renderField = (
@@ -147,7 +164,13 @@ const FormModal = ({
         );
       }
       case "dropdown": {
-        return <Dropdown field={field} setFieldValue={setFieldValue} />;
+        return (
+          <Dropdown
+            field={field}
+            setFieldValue={setFieldValue}
+            handleSecondDropdown={handleSecondDropdown}
+          />
+        );
       }
       default: {
         return (
@@ -180,7 +203,6 @@ const FormModal = ({
             touched,
             handleChange,
             handleBlur,
-            handleSubmit,
             setFieldValue,
           }) => (
             <Form onSubmit={(event) => formSubmitHandler(event, values)}>

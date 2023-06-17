@@ -18,6 +18,8 @@ export const MainContent = ({
   formSubmitHandler,
   isAddFormVisible,
   isFormEditCategory,
+  isSecondDropdown,
+  handleSecondDropdown,
 }) => {
   return (
     <Container className="main-content main-style">
@@ -66,6 +68,8 @@ export const MainContent = ({
           modalHeading={modalHeading}
           isFormEditCategory={isFormEditCategory}
           formSubmitHandler={formSubmitHandler}
+          isSecondDropdown={isSecondDropdown}
+          handleSecondDropdown={handleSecondDropdown}
         />
       )}
     </Container>

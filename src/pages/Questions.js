@@ -13,6 +13,26 @@ export default function Questions() {
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [modalHeading, setModalHeading] = useState("");
+  const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [editFormFields, setEditFormFields] = useState([]);
+  const formFields = [
+    {
+      name: "category",
+      label: "Category",
+      type: "dropdown",
+      options: categories,
+    },
+    {
+      name: "question",
+      label: "Question",
+      type: "text",
+    },
+  ];
+  const [addFormFields, setAddFormFields] = useState([]);
 
   const columns = [
     {
@@ -50,7 +70,12 @@ export default function Questions() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => {
+              setModalHeading("Edit Category");
+              setIsFormEditCategory(true);
+              handleEditFormFields(row);
+              handleToggleModal();
+            }}
             cursor="pointer"
           />
           <MdDelete
@@ -98,6 +123,65 @@ export default function Questions() {
     getQuestions(1);
   }, [getQuestions]);
 
+  const getCategories = async () => {
+    try {
+      const token = LocalStorage.getData("token");
+      const categoriesRespData = await http.get(
+        `category/?page=1&page_size=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const categories = categoriesRespData.results.map((category) => ({
+        id: category.id,
+        name: category.name,
+      }));
+      setCategories(categories);
+      let fields = [...formFields];
+      fields.splice(0, 1, {
+        name: "category",
+        label: "Category",
+        type: "dropdown",
+        options: categories,
+      });
+
+      setAddFormFields(fields);
+    } catch (error) {
+      console.log(error, "145");
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
+
+  const getSubCategories = async (id) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const categoriesRespData = await http.get(
+        `sub-category/?category_id=${id}&page_size=500`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const categories = categoriesRespData.results.map((category) => ({
+        id: category.id,
+        name: category.name,
+      }));
+      setSubCategories(categories);
+    } catch (error) {
+      console.log(JSON.stringify(error), 25);
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
@@ -119,13 +203,52 @@ export default function Questions() {
   const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
-
-  const handleAdd = () => {
-    console.log("add");
+  const handleToggleModal = () => {
+    setShowForm(!showForm);
+    isFormEditCategory && setIsFormEditCategory(false);
   };
 
-  const handleEdit = () => {
-    console.log("edit");
+  const handleAdd = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    setShowForm(false);
+    setModalHeading("");
+  };
+
+  const handleEdit = (event, values) => {
+    event.preventDefault();
+    console.log("edit", values);
+  };
+
+  const handleEditFormFields = (rowData) => {
+    const fields = formFields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(rowData, fields);
+    setEditFormFields(fields);
+  };
+
+  const addSecondDropdown = () => {
+    let fields = [...formFields];
+    fields.splice(1, 0, {
+      name: "subcategory",
+      label: "Sub Category",
+      type: "dropdown",
+      options: subCategories,
+    });
+    setAddFormFields(fields);
+  };
+
+  const handleSecondDropdown = async (id) => {
+    await getSubCategories(id);
+    console.log(subCategories);
+    addSecondDropdown();
+
+    // console.log(fields);
+    // setFormFields(fields);
   };
 
   const handleDelete = async (id) => {
@@ -138,7 +261,8 @@ export default function Questions() {
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Category"
+          title="Question"
+          modalHeading={modalHeading}
           data={data}
           columns={columns}
           totalRows={totalRows}
@@ -147,6 +271,15 @@ export default function Questions() {
           handleAdd={handleAdd}
           handleDelete={handleDelete}
           isRemote={true}
+          handleToggleModal={handleToggleModal}
+          setModalHeading={setModalHeading}
+          showForm={showForm}
+          fields={isFormEditCategory ? editFormFields : addFormFields}
+          formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
+          isAddFormVisible={true}
+          isFormEditCategory={isFormEditCategory}
+          isSecondDropdown={true}
+          handleSecondDropdown={handleSecondDropdown}
         />
       </div>
     </div>

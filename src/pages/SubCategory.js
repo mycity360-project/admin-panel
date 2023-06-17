@@ -14,9 +14,12 @@ export default function SubCategory() {
   const [totalRows, setTotalRows] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [modalHeading, setModalHeading] = useState("");
+  const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [editFormFields, setEditFormFields] = useState([]);
   //   const [loading, setLoading] = useState(false);
 
-  const addFormFeilds = [
+  const formFields = [
     {
       name: "category",
       label: "Category",
@@ -55,7 +58,12 @@ export default function SubCategory() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => {
+              setModalHeading("Edit Category");
+              setIsFormEditCategory(true);
+              handleEditFormFields(row);
+              handleToggleModal();
+            }}
             cursor="pointer"
           />
           <MdDelete
@@ -152,19 +160,9 @@ export default function SubCategory() {
     setPerPage(newPerPage);
   };
 
-  const handleEdit = () => {
-    console.log("edit");
-  };
-
-  const handleDelete = async (id) => {
-    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
-    if (shouldDelete) {
-      await deleteSubCategory(id);
-    }
-  };
-
   const handleToggleModal = () => {
     setShowForm(!showForm);
+    isFormEditCategory && setIsFormEditCategory(false);
   };
 
   const createSubCategory = async (values) => {
@@ -199,13 +197,36 @@ export default function SubCategory() {
     await createSubCategory(values);
     setShowForm(false);
   };
+
+  const handleEdit = (values) => {
+    console.log("edit", values);
+  };
+
+  const handleDelete = async (id) => {
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteSubCategory(id);
+    }
+  };
+
+  const handleEditFormFields = (rowData) => {
+    const fields = formFields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(rowData, fields);
+    setEditFormFields(fields);
+  };
   return (
     <div>
       <NavigationBar />
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Category"
+          title="Sub Category"
+          modalHeading={modalHeading}
           data={data}
           columns={columns}
           totalRows={totalRows}
@@ -216,9 +237,10 @@ export default function SubCategory() {
           isRemote={true}
           isAddFormVisible={true}
           showForm={showForm}
-          fields={addFormFeilds}
-          modalHeading={"Add Sub Category"}
-          handleAdd={handleAdd}
+          fields={isFormEditCategory ? editFormFields : formFields}
+          setModalHeading={setModalHeading}
+          formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
+          isFormEditCategory={isFormEditCategory}
         />
       </div>
     </div>
