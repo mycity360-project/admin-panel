@@ -10,14 +10,10 @@ const FormModal = ({
   modalHeading,
   formSubmitHandler,
   isFormEditCategory,
-  isSecondDropdown,
-  handleSecondDropdown,
 }) => {
   const initialValues = {};
   const validationSchema = {};
-  const [selectedOption, setSelectedOption] = useState("");
-  // const [imageUrl, setImageUrl] = useState("");
-  const [isSecondDropdownCreated, setIsSecondDropdownCreated] = useState(false);
+  const [selectedOption, setSelectedOption] = useState({});
 
   // Component for rendering text fields
   const TextField = ({
@@ -115,22 +111,14 @@ const FormModal = ({
     validationSchema[field.name] = field.validation;
   });
 
-  const handleOptionSelect = (
-    event,
-    field,
-    setFieldValue,
-    handleSecondDropdown
-  ) => {
+  const handleOptionSelect = (event, field, setFieldValue) => {
     const selectedId = event.target.value;
-    const selectedOption = field.options.find(
+    const selectedItem = field.options.find(
       (option) => option.id === parseInt(selectedId)
     );
-    setSelectedOption(selectedOption);
+    setSelectedOption(selectedItem);
+
     setFieldValue(`${field.name}`, parseInt(selectedId));
-    if (isSecondDropdown) {
-      handleSecondDropdown(selectedId);
-      //setIsSecondDropdownCreated(true);
-    }
   };
 
   const renderField = (
@@ -168,7 +156,7 @@ const FormModal = ({
           <Dropdown
             field={field}
             setFieldValue={setFieldValue}
-            handleSecondDropdown={handleSecondDropdown}
+            values={values}
           />
         );
       }
@@ -204,6 +192,7 @@ const FormModal = ({
             handleChange,
             handleBlur,
             setFieldValue,
+            isSubmitting,
           }) => (
             <Form onSubmit={(event) => formSubmitHandler(event, values)}>
               {fields.map((field) => (
@@ -223,7 +212,7 @@ const FormModal = ({
                   )}
                 </Form.Group>
               ))}
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
                 Submit
               </Button>
             </Form>

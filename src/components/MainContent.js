@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Container } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import FormModal from "./FormModal";
+import FormDropdownModal from "./FormDropDownModal";
 export const MainContent = ({
   title,
   data,
@@ -18,8 +19,10 @@ export const MainContent = ({
   formSubmitHandler,
   isAddFormVisible,
   isFormEditCategory,
-  isSecondDropdown,
-  handleSecondDropdown,
+  isFromQuestion,
+  isFormReqDropdown,
+  formFields,
+  handleSecondDropdownData,
 }) => {
   return (
     <Container className="main-content main-style">
@@ -60,16 +63,26 @@ export const MainContent = ({
         }}
         paginationRowsPerPageOptions={[10, 15]}
       />
-      {showForm && (
+      {!isFormReqDropdown && showForm && (
         <FormModal
+          show={showForm}
+          onHide={() => handleToggleModal()}
+          modalHeading={modalHeading}
+          isFormEditCategory={isFormEditCategory}
+          formSubmitHandler={formSubmitHandler}
+        />
+      )}
+      {isFormReqDropdown && showForm && (
+        <FormDropdownModal
           show={showForm}
           onHide={() => handleToggleModal()}
           fields={fields}
           modalHeading={modalHeading}
           isFormEditCategory={isFormEditCategory}
           formSubmitHandler={formSubmitHandler}
-          isSecondDropdown={isSecondDropdown}
-          handleSecondDropdown={handleSecondDropdown}
+          formFields={formFields}
+          isFromQuestion={isFromQuestion}
+          handleSecondDropdownData={handleSecondDropdownData}
         />
       )}
     </Container>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import SidebarMenu from "../components/SidebarMenu";
 import { LocalStorage } from "../shared/lib";
@@ -13,26 +13,42 @@ export default function Questions() {
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
   const [isFormEditCategory, setIsFormEditCategory] = useState(false);
-  const [editFormFields, setEditFormFields] = useState([]);
-  const formFields = [
-    {
-      name: "category",
-      label: "Category",
-      type: "dropdown",
-      options: categories,
-    },
-    {
-      name: "question",
-      label: "Question",
-      type: "text",
-    },
-  ];
-  const [addFormFields, setAddFormFields] = useState([]);
+
+  const formFields = useMemo(() => {
+    return [
+      {
+        name: "category",
+        label: "Category",
+      },
+      {
+        name: "subcategory",
+        label: "Sub Category",
+      },
+      {
+        name: "question",
+        label: "Question",
+      },
+      {
+        name: "sequence",
+        label: "Sequence",
+      },
+      {
+        name: "field_type",
+        label: "Field Type",
+        options: ["Text", "Number", "Dropdown", "Toggle"],
+      },
+      {
+        name: "values_dropdown",
+        label: "Values",
+        defaultValue: [""],
+      },
+    ];
+  }, []);
+
+  const [fields, setFields] = useState([]);
 
   const columns = [
     {
@@ -73,7 +89,7 @@ export default function Questions() {
             onClick={() => {
               setModalHeading("Edit Category");
               setIsFormEditCategory(true);
-              handleEditFormFields(row);
+              //handleEditFormFields(row);
               handleToggleModal();
             }}
             cursor="pointer"
@@ -99,6 +115,7 @@ export default function Questions() {
 
       try {
         const token = LocalStorage.getData("token");
+
         const questionResp = await http.get(
           `question/?page=${page}&page_size=${perPage}`,
           {
@@ -123,11 +140,12 @@ export default function Questions() {
     getQuestions(1);
   }, [getQuestions]);
 
-  const getCategories = async () => {
+  const getCategories = useCallback(async () => {
     try {
       const token = LocalStorage.getData("token");
+
       const categoriesRespData = await http.get(
-        `category/?page=1&page_size=100`,
+        `category/?page=1&page_size=500`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -138,30 +156,28 @@ export default function Questions() {
         id: category.id,
         name: category.name,
       }));
-      setCategories(categories);
-      let fields = [...formFields];
-      fields.splice(0, 1, {
+      const items = [...formFields];
+      items.splice(0, 1, {
         name: "category",
         label: "Category",
-        type: "dropdown",
         options: categories,
       });
-
-      setAddFormFields(fields);
+      setFields(items);
     } catch (error) {
       console.log(error, "145");
     } finally {
       //   setLoading(false);
     }
-  };
+  }, [formFields]);
 
   useEffect(() => {
     getCategories();
-  }, []);
+  }, [getCategories]);
 
   const getSubCategories = async (id) => {
     try {
       const token = LocalStorage.getData("token");
+
       const categoriesRespData = await http.get(
         `sub-category/?category_id=${id}&page_size=500`,
         {
@@ -170,11 +186,17 @@ export default function Questions() {
           },
         }
       );
-      const categories = categoriesRespData.results.map((category) => ({
+      const subcategories = categoriesRespData.results.map((category) => ({
         id: category.id,
         name: category.name,
       }));
-      setSubCategories(categories);
+      const items = [...fields];
+      items.splice(1, 1, {
+        name: "subcategory",
+        label: "Sub Category",
+        options: subcategories,
+      });
+      setFields(items);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -185,6 +207,7 @@ export default function Questions() {
   const deleteCategory = async (id) => {
     try {
       const token = LocalStorage.getData("token");
+
       await http.delete(`question/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -205,12 +228,49 @@ export default function Questions() {
   };
   const handleToggleModal = () => {
     setShowForm(!showForm);
-    isFormEditCategory && setIsFormEditCategory(false);
+    //isFormEditCategory && setIsFormEditCategory(false);
+  };
+
+  const handleSecondDropdownData = async (id) => {
+    await getSubCategories(id);
+  };
+
+  const addQuestion = async (quesData) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = "question/";
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+      const data = {
+        question: quesData.question,
+        sequence: quesData.sequence,
+        category: {
+          ...(quesData.subcategory
+            ? { id: quesData.subcategory }
+            : { id: quesData.category }),
+        },
+        field_type: quesData.field_type,
+        ...(quesData.field_type === "Dropdown"
+          ? { values: quesData.values_dropdown }
+          : {}),
+      };
+      // console.log(data);
+      const resp = await http.post(url, data, config);
+      console.log(resp);
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
+    }
   };
 
   const handleAdd = async (event, values) => {
     event.preventDefault();
     console.log("hi", values);
+    await addQuestion(values);
     setShowForm(false);
     setModalHeading("");
   };
@@ -220,36 +280,16 @@ export default function Questions() {
     console.log("edit", values);
   };
 
-  const handleEditFormFields = (rowData) => {
-    const fields = formFields.map((field) => {
-      return {
-        ...field,
-        defaultValue: rowData[field.name],
-      };
-    });
-    console.log(rowData, fields);
-    setEditFormFields(fields);
-  };
-
-  const addSecondDropdown = () => {
-    let fields = [...formFields];
-    fields.splice(1, 0, {
-      name: "subcategory",
-      label: "Sub Category",
-      type: "dropdown",
-      options: subCategories,
-    });
-    setAddFormFields(fields);
-  };
-
-  const handleSecondDropdown = async (id) => {
-    await getSubCategories(id);
-    console.log(subCategories);
-    addSecondDropdown();
-
-    // console.log(fields);
-    // setFormFields(fields);
-  };
+  // const handleEditFormFields = (rowData) => {
+  //   const fields = formFields.map((field) => {
+  //     return {
+  //       ...field,
+  //       defaultValue: rowData[field.name],
+  //     };
+  //   });
+  //   console.log(rowData, fields);
+  //   setEditFormFields(fields);
+  // };
 
   const handleDelete = async (id) => {
     await deleteCategory(id);
@@ -274,12 +314,13 @@ export default function Questions() {
           handleToggleModal={handleToggleModal}
           setModalHeading={setModalHeading}
           showForm={showForm}
-          fields={isFormEditCategory ? editFormFields : addFormFields}
+          formFields={fields}
           formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
           isAddFormVisible={true}
           isFormEditCategory={isFormEditCategory}
-          isSecondDropdown={true}
-          handleSecondDropdown={handleSecondDropdown}
+          isFromQuestion={true}
+          isFormReqDropdown={true}
+          handleSecondDropdownData={handleSecondDropdownData}
         />
       </div>
     </div>
