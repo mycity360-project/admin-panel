@@ -10,6 +10,13 @@ export default function State() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showForm, setShowForm] = useState(false);
+  const [modalHeading, setModalHeading] = useState("");
+  const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [editFormFields, setEditFormFields] = useState([]);
+  const [stateIdSelectedForEdit, setStateIdSelectedForEdit] = useState("");
+
+  const formFields = [{ name: "name", label: "Location", type: "text" }];
 
   const columns = [
     {
@@ -29,7 +36,12 @@ export default function State() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => {
+              setModalHeading("Edit Location");
+              setIsFormEditCategory(true);
+              handleEditFormFields(row);
+              handleToggleModal();
+            }}
             cursor="pointer"
           />
           <MdDelete
@@ -97,16 +109,87 @@ export default function State() {
     setPerPage(newPerPage);
   };
 
-  const handleAdd = () => {
-    console.log("add");
+  const addState = async (stateData) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = "state/";
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        name: stateData.name,
+      };
+
+      const resp = await http.post(url, data, config);
+      console.log(resp);
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
+    }
   };
 
-  const handleEdit = () => {
-    console.log("edit");
+  const updateState = async (stateData, id) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = `state/${id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        name: stateData.name,
+      };
+
+      console.log(data);
+      const resp = await http.put(url, data, config);
+      console.log(resp);
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
+  const handleAdd = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    await addState(values);
+    setShowForm(false);
+    setModalHeading("");
+  };
+
+  const handleEdit = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    await updateState(values, stateIdSelectedForEdit);
+    setShowForm(false);
+    setModalHeading("");
+  };
+
+  const handleEditFormFields = (rowData) => {
+    const fields = formFields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(rowData, fields);
+    setStateIdSelectedForEdit(rowData.id);
+    setEditFormFields(fields);
   };
 
   const handleDelete = async (id) => {
     await deleteState(id);
+  };
+  const handleToggleModal = () => {
+    setShowForm(!showForm);
+    isFormEditCategory && setIsFormEditCategory(false);
   };
 
   return (
@@ -115,14 +198,22 @@ export default function State() {
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
-          title="Area"
+          title="State"
           data={data}
+          modalHeading={modalHeading}
           columns={columns}
           isRemote={false}
           handleAdd={handleAdd}
           handleDelete={handleDelete}
           handlePageChange={handlePageChange}
           handlePerRowsChange={handlePerRowsChange}
+          handleToggleModal={handleToggleModal}
+          isAddFormVisible={true}
+          showForm={showForm}
+          formFields={isFormEditCategory ? editFormFields : formFields}
+          setModalHeading={setModalHeading}
+          formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
+          isFormEditCategory={isFormEditCategory}
         />
       </div>
     </div>

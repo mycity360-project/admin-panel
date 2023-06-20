@@ -13,7 +13,7 @@ const FormModal = ({
 }) => {
   const initialValues = {};
   const validationSchema = {};
-  const [selectedOption, setSelectedOption] = useState({});
+  const [selectedOption, setSelectedOption] = useState("");
 
   // Component for rendering text fields
   const TextField = ({

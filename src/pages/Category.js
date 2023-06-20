@@ -270,6 +270,7 @@ export default function Category() {
     await uploadIcon(values.icon, categoryIdSelectedForEdit);
     setShowForm(false);
     setModalHeading("");
+    setCategoryIdSelectedForEdit("");
   };
 
   const handleEditFormFields = (rowData) => {

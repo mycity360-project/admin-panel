@@ -202,6 +202,7 @@ export default function SubCategory() {
     console.log("hi", values);
     await createSubCategory(values);
     setShowForm(false);
+    setModalHeading("");
   };
 
   const handleEdit = (values) => {
@@ -243,7 +244,7 @@ export default function SubCategory() {
           isRemote={true}
           isAddFormVisible={true}
           showForm={showForm}
-          fields={isFormEditCategory ? editFormFields : formFields}
+          formFields={isFormEditCategory ? editFormFields : formFields}
           setModalHeading={setModalHeading}
           formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
           isFormEditCategory={isFormEditCategory}

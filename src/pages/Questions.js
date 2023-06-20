@@ -170,6 +170,7 @@ export default function Questions() {
         options: categories,
       });
       setFields(items);
+      setEditFormFields(items);
     } catch (error) {
       console.log(error, "145");
     } finally {
@@ -197,14 +198,22 @@ export default function Questions() {
         id: category.id,
         name: category.name,
       }));
-      const items = [...fields];
-      items.splice(1, 1, {
-        name: "subcategory",
-        label: "Sub Category",
-        options: subcategories,
-      });
-      console.log(subcategories, id);
+      // const items = [...fields];
+      // items.splice(1, 1, {
+      //   name: "subcategory",
+      //   label: "Sub Category",
+      //   options: subcategories,
+      // });
+      const items = [
+        fields[0],
+        {
+          ...fields[1],
+          options: subcategories,
+        },
+        ...fields.slice(2),
+      ];
       setFields(items);
+      setEditFormFields(items);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -289,7 +298,7 @@ export default function Questions() {
   };
 
   const handleEditFormFields = (rowData) => {
-    const fieldData = fields.map((field) => {
+    const fieldData = editFormFields.map((field) => {
       return {
         ...field,
         defaultValue: rowData[field.name],

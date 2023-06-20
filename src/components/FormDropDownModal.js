@@ -64,6 +64,7 @@ const FormDropdownModal = ({
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event, setFieldValue) => {
+    setShowSecondDropdown(false);
     const selectedId = event.target.value;
     handleSecondDropdownData(parseInt(selectedId));
     const selectedItem = firstDropdownData.options.find(
@@ -71,7 +72,6 @@ const FormDropdownModal = ({
     );
     setFirstDropdownSelectedData(selectedItem);
     setFieldValue(`${firstDropdownData.name}`, parseInt(selectedId));
-    // setShowSecondDropdown(true);
   };
 
   const handleOptionSelectSecondDropdown = (event, setFieldValue) => {
@@ -137,7 +137,7 @@ const FormDropdownModal = ({
                     onChange={(event) =>
                       handleOptionSelectFirstDropdown(event, setFieldValue)
                     }
-                    onClick={() => setShowSecondDropdown(false)}
+                    // onClick={() => setShowSecondDropdown(false)}
                     value={
                       firstDropdownSelectedData
                         ? firstDropdownSelectedData?.id
@@ -255,55 +255,58 @@ const FormDropdownModal = ({
                   </Form.Group>
                 )}
 
-                {thirdDropdownSelectedData === "Dropdown" && (
+                {(thirdDropdownSelectedData === "Dropdown" ||
+                  values[thirdDropdownData.name] === "Dropdown") && (
                   <>
                     <Form.Label>Enter {questionDropdownData.label}</Form.Label>
                     <Row>
                       <Col>
                         {values[questionDropdownData.name]?.map(
-                          (inputValue, index) => (
-                            <div key={index}>
-                              <Form.Group>
-                                <Form.Control
-                                  size="sm"
-                                  type="text"
-                                  value={inputValue}
-                                  onChange={(event) => {
-                                    const updatedValues = [
-                                      ...values[questionDropdownData.name],
-                                    ];
-                                    updatedValues[index] = event.target.value;
-                                    setFieldValue(
-                                      questionDropdownData.name,
-                                      updatedValues
+                          (inputValue, index) => {
+                            return (
+                              <div key={index}>
+                                <Form.Group>
+                                  <Form.Control
+                                    size="sm"
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(event) => {
+                                      const updatedValues = [
+                                        ...values[questionDropdownData.name],
+                                      ];
+                                      updatedValues[index] = event.target.value;
+                                      setFieldValue(
+                                        questionDropdownData.name,
+                                        updatedValues
+                                      );
+                                    }}
+                                  />
+                                </Form.Group>
+                                <MdDelete
+                                  color="#333"
+                                  size={20}
+                                  cursor="pointer"
+                                  style={{
+                                    marginLeft: "10px",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.color = "red";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.color = "#333";
+                                  }}
+                                  onClick={() => {
+                                    console.log("delete");
+                                    handleDeleteInputField(
+                                      index,
+                                      setFieldValue,
+                                      values
                                     );
                                   }}
                                 />
-                              </Form.Group>
-                              <MdDelete
-                                color="#333"
-                                size={20}
-                                cursor="pointer"
-                                style={{
-                                  marginLeft: "10px",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.color = "red";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.color = "#333";
-                                }}
-                                onClick={() => {
-                                  console.log("delete");
-                                  handleDeleteInputField(
-                                    index,
-                                    setFieldValue,
-                                    values
-                                  );
-                                }}
-                              />
-                            </div>
-                          )
+                              </div>
+                            );
+                          }
                         )}
                       </Col>
                     </Row>
