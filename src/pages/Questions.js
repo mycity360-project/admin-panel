@@ -236,7 +236,7 @@ export default function Questions() {
   };
   const handleToggleModal = () => {
     setShowForm(!showForm);
-    //isFormEditCategory && setIsFormEditCategory(false);
+    isFormEditCategory && setIsFormEditCategory(false);
   };
 
   const handleSecondDropdownData = async (id) => {
@@ -288,7 +288,7 @@ export default function Questions() {
     console.log("edit", values);
   };
 
-  const handleEditFormFields = async (rowData) => {
+  const handleEditFormFields = (rowData) => {
     const fieldData = fields.map((field) => {
       return {
         ...field,

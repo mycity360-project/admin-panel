@@ -152,7 +152,7 @@ const FormDropdownModal = ({
                     ))}
                   </Form.Select>
                 </Form.Group>
-                {true && (
+                {showSecondDropdown && (
                   <Form.Group
                     controlId={secondDropdownData.name}
                     key={secondDropdownData.name}
