@@ -36,6 +36,12 @@ export default function State() {
             color="#444"
             size={20}
             cursor="pointer"
+            onMouseEnter={(e) => {
+              e.target.style.color = "red";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "#444";
+            }}
             style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
@@ -83,13 +89,13 @@ export default function State() {
     }
   };
 
-   const handlePageChange = async (page) => {
-     setCurrentPage(page);
-   };
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+  };
 
-   const handlePerRowsChange = async (newPerPage) => {
-     setPerPage(newPerPage);
-   };
+  const handlePerRowsChange = async (newPerPage) => {
+    setPerPage(newPerPage);
+  };
 
   const handleAdd = () => {
     console.log("add");

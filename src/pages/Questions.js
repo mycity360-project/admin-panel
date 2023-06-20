@@ -16,6 +16,8 @@ export default function Questions() {
   const [showForm, setShowForm] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
   const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [fields, setFields] = useState([]);
+  const [editFormFields, setEditFormFields] = useState([]);
 
   const formFields = useMemo(() => {
     return [
@@ -41,14 +43,12 @@ export default function Questions() {
         options: ["Text", "Number", "Dropdown", "Toggle"],
       },
       {
-        name: "values_dropdown",
+        name: "values",
         label: "Values",
         defaultValue: [""],
       },
     ];
   }, []);
-
-  const [fields, setFields] = useState([]);
 
   const columns = [
     {
@@ -86,10 +86,11 @@ export default function Questions() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => {
+            onClick={async () => {
               setModalHeading("Edit Category");
               setIsFormEditCategory(true);
-              //handleEditFormFields(row);
+              handleSecondDropdownData(row.category?.id);
+              handleEditFormFields(row);
               handleToggleModal();
             }}
             cursor="pointer"
@@ -98,6 +99,12 @@ export default function Questions() {
             color="#444"
             size={20}
             cursor="pointer"
+            onMouseEnter={(e) => {
+              e.target.style.color = "red";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "#444";
+            }}
             style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
@@ -196,6 +203,7 @@ export default function Questions() {
         label: "Sub Category",
         options: subcategories,
       });
+      console.log(subcategories, id);
       setFields(items);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -204,19 +212,19 @@ export default function Questions() {
     }
   };
 
-  const deleteCategory = async (id) => {
-    try {
-      const token = LocalStorage.getData("token");
+  // const deleteCategory = async (id) => {
+  //   try {
+  //     const token = LocalStorage.getData("token");
 
-      await http.delete(`question/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.log(error, "165");
-    }
-  };
+  //     await http.delete(`question/${id}/`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log(error, "165");
+  //   }
+  // };
 
   const handlePageChange = async (page) => {
     setCurrentPage(page);
@@ -280,19 +288,19 @@ export default function Questions() {
     console.log("edit", values);
   };
 
-  // const handleEditFormFields = (rowData) => {
-  //   const fields = formFields.map((field) => {
-  //     return {
-  //       ...field,
-  //       defaultValue: rowData[field.name],
-  //     };
-  //   });
-  //   console.log(rowData, fields);
-  //   setEditFormFields(fields);
-  // };
+  const handleEditFormFields = async (rowData) => {
+    const fieldData = fields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(fieldData);
+    setEditFormFields(fieldData);
+  };
 
   const handleDelete = async (id) => {
-    await deleteCategory(id);
+    //await deleteCategory(id);
   };
 
   return (
@@ -314,7 +322,7 @@ export default function Questions() {
           handleToggleModal={handleToggleModal}
           setModalHeading={setModalHeading}
           showForm={showForm}
-          formFields={fields}
+          formFields={isFormEditCategory ? editFormFields : fields}
           formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
           isAddFormVisible={true}
           isFormEditCategory={isFormEditCategory}

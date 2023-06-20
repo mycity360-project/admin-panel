@@ -54,6 +54,12 @@ export default function Service() {
             color="#444"
             size={20}
             cursor="pointer"
+            onMouseEnter={(e) => {
+              e.target.style.color = "red";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "#444";
+            }}
             style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />

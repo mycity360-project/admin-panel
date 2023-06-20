@@ -6,7 +6,7 @@ import * as Yup from "yup";
 const FormModal = ({
   show,
   onHide,
-  fields,
+  formFields,
   modalHeading,
   formSubmitHandler,
   isFormEditCategory,
@@ -66,23 +66,26 @@ const FormModal = ({
             name={field.name}
             onChange={(event) => {
               const file = event.target.files[0];
-              setFieldValue(`${field.name}`, file);
+              setFieldValue(field.name, file);
+              setFieldValue("isEdited", true);
             }}
             accept="image/*"
           />
         </Col>
 
         <Col>
-          <Image
-            src={
-              !isFormEditCategory
-                ? URL.createObjectURL(values[field.name])
-                : field.defaultValue
-            }
-            width={35}
-            height={35}
-            rounded
-          />
+          {(values[field.name] || field.defaultValue) && (
+            <Image
+              src={
+                values["isEdited"]
+                  ? URL.createObjectURL(values[field.name])
+                  : field.defaultValue
+              }
+              width={35}
+              height={35}
+              rounded
+            />
+          )}
         </Col>
       </Row>
     </>
@@ -106,7 +109,7 @@ const FormModal = ({
     </Form.Select>
   );
 
-  fields.forEach((field) => {
+  formFields.forEach((field) => {
     initialValues[field.name] = field.defaultValue ?? "";
     validationSchema[field.name] = field.validation;
   });
@@ -195,7 +198,7 @@ const FormModal = ({
             isSubmitting,
           }) => (
             <Form onSubmit={(event) => formSubmitHandler(event, values)}>
-              {fields.map((field) => (
+              {formFields.map((field) => (
                 <Form.Group
                   controlId={field.name}
                   key={field.name}

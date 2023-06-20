@@ -14,7 +14,6 @@ export const MainContent = ({
   handleToggleModal,
   setModalHeading,
   showForm,
-  fields,
   modalHeading,
   formSubmitHandler,
   isAddFormVisible,
@@ -66,6 +65,7 @@ export const MainContent = ({
       {!isFormReqDropdown && showForm && (
         <FormModal
           show={showForm}
+          formFields={formFields}
           onHide={() => handleToggleModal()}
           modalHeading={modalHeading}
           isFormEditCategory={isFormEditCategory}
@@ -76,7 +76,6 @@ export const MainContent = ({
         <FormDropdownModal
           show={showForm}
           onHide={() => handleToggleModal()}
-          fields={fields}
           modalHeading={modalHeading}
           isFormEditCategory={isFormEditCategory}
           formSubmitHandler={formSubmitHandler}

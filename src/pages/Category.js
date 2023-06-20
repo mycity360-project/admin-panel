@@ -18,6 +18,8 @@ export default function Category() {
   const [modalHeading, setModalHeading] = useState("");
   const [isFormEditCategory, setIsFormEditCategory] = useState(false);
   const [editFormFields, setEditFormFields] = useState([]);
+  const [categoryIdSelectedForEdit, setCategoryIdSelectedForEdit] =
+    useState("");
 
   const formFields = [
     {
@@ -99,6 +101,12 @@ export default function Category() {
             color="#444"
             size={20}
             cursor="pointer"
+            onMouseEnter={(e) => {
+              e.target.style.color = "red";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "#444";
+            }}
             style={{ marginLeft: "10px" }}
             onClick={() => handleDelete(row.id)}
           />
@@ -214,7 +222,33 @@ export default function Category() {
         price_limit: values.price_limit,
       };
       const resp = await http.post(url, data, config);
+      console.log(resp);
       return resp;
+    } catch (error) {
+      console.log(error, "223");
+    }
+  };
+
+  const updateCategory = async (values) => {
+    try {
+      console.log(categoryIdSelectedForEdit);
+      const token = LocalStorage.getData("token");
+      const url = `category/${categoryIdSelectedForEdit}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        name: values.name,
+        phone: values.phone,
+        is_price: values.is_price,
+        price_limit: values.price_limit,
+      };
+      console.log(data, "api");
+      const resp = await http.put(url, data, config);
+      console.log(resp);
     } catch (error) {
       console.log(error, "223");
     }
@@ -229,9 +263,13 @@ export default function Category() {
     setModalHeading("");
   };
 
-  const handleEdit = (event, values) => {
+  const handleEdit = async (event, values) => {
     event.preventDefault();
     console.log("edit", values);
+    await updateCategory(values);
+    await uploadIcon(values.icon, categoryIdSelectedForEdit);
+    setShowForm(false);
+    setModalHeading("");
   };
 
   const handleEditFormFields = (rowData) => {
@@ -242,6 +280,7 @@ export default function Category() {
       };
     });
     console.log(rowData, fields);
+    setCategoryIdSelectedForEdit(rowData.id);
     setEditFormFields(fields);
   };
 
@@ -269,7 +308,7 @@ export default function Category() {
           handleToggleModal={handleToggleModal}
           setModalHeading={setModalHeading}
           showForm={showForm}
-          fields={isFormEditCategory ? editFormFields : formFields}
+          formFields={isFormEditCategory ? editFormFields : formFields}
           formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
           isRemote={true}
           isAddFormVisible={true}

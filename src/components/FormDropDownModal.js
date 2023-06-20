@@ -15,6 +15,7 @@ const FormDropdownModal = ({
   formFields,
   handleSecondDropdownData,
 }) => {
+  console.log(formFields, 18);
   const initialValues = {};
   const validationSchema = {};
   const [firstDropdownData, setFirstDropdownData] = useState(formFields[0]);
@@ -24,20 +25,19 @@ const FormDropdownModal = ({
   );
   const [areaOrQuestionInputFieldData, SetAreaOrQuestionInputFieldData] =
     useState(formFields[2]);
-  const [sequenceFieldData, setSequenceFieldData] = useState(formFields[3]);
+  const [sequenceOrPincodeFieldData, setSequenceOrPincodeFieldData] = useState(
+    formFields[3]
+  );
   const [questionDropdownData, setQuestionDropdownData] = useState(
     formFields[5] || []
   );
 
-  const [firstDropdownSelectedData, setFirstDropdownSelectedData] = useState(
-    {}
-  );
-  const [secondDropdownSelectedData, setSecondDropdownSelectedData] = useState(
-    {}
-  );
-  const [thirdDropdownSelectedData, setThirdDropdownSelectedData] = useState(
-    {}
-  );
+  const [firstDropdownSelectedData, setFirstDropdownSelectedData] =
+    useState("");
+  const [secondDropdownSelectedData, setSecondDropdownSelectedData] =
+    useState("");
+  const [thirdDropdownSelectedData, setThirdDropdownSelectedData] =
+    useState("");
   const [showSecondDropdown, setShowSecondDropdown] = useState(false);
 
   formFields.forEach((field) => {
@@ -50,7 +50,7 @@ const FormDropdownModal = ({
     setSecondDropdownData(formFields[1]);
     SetAreaOrQuestionInputFieldData(formFields[2]);
     if (isFromQuestion) {
-      setSequenceFieldData(formFields[3]);
+      setSequenceOrPincodeFieldData(formFields[3]);
       setThirdDropdownData(formFields[4]);
       setQuestionDropdownData(formFields[5]);
     }
@@ -60,10 +60,10 @@ const FormDropdownModal = ({
     if (secondDropdownData.options?.length) {
       setShowSecondDropdown(true);
     }
+    console.log(secondDropdownData);
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event, setFieldValue) => {
-    setShowSecondDropdown(false);
     const selectedId = event.target.value;
     handleSecondDropdownData(parseInt(selectedId));
     const selectedItem = firstDropdownData.options.find(
@@ -71,6 +71,7 @@ const FormDropdownModal = ({
     );
     setFirstDropdownSelectedData(selectedItem);
     setFieldValue(`${firstDropdownData.name}`, parseInt(selectedId));
+    // setShowSecondDropdown(true);
   };
 
   const handleOptionSelectSecondDropdown = (event, setFieldValue) => {
@@ -136,21 +137,22 @@ const FormDropdownModal = ({
                     onChange={(event) =>
                       handleOptionSelectFirstDropdown(event, setFieldValue)
                     }
+                    onClick={() => setShowSecondDropdown(false)}
                     value={
                       firstDropdownSelectedData
-                        ? firstDropdownSelectedData.id
-                        : "" //firstDropdownData.defaultValue?.id
+                        ? firstDropdownSelectedData?.id
+                        : firstDropdownData.defaultValue?.id
                     }
                   >
                     <option value="">Select {firstDropdownData.label}</option>
-                    {firstDropdownData.options.map((option) => (
+                    {firstDropdownData.options?.map((option) => (
                       <option key={option.id} value={option.id}>
                         {option.name}
                       </option>
                     ))}
                   </Form.Select>
                 </Form.Group>
-                {showSecondDropdown && (
+                {true && (
                   <Form.Group
                     controlId={secondDropdownData.name}
                     key={secondDropdownData.name}
@@ -165,14 +167,14 @@ const FormDropdownModal = ({
                       }
                       value={
                         secondDropdownSelectedData
-                          ? secondDropdownSelectedData.id
-                          : ""
+                          ? secondDropdownSelectedData?.id
+                          : secondDropdownData.defaultValue?.id
                       }
                     >
                       <option value="">
                         Select {secondDropdownData.label}
                       </option>
-                      {secondDropdownData.options.map((option) => (
+                      {secondDropdownData.options?.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name}
                         </option>
@@ -202,34 +204,63 @@ const FormDropdownModal = ({
                     {errors[areaOrQuestionInputFieldData.name]}
                   </Form.Control.Feedback>
                 </Form.Group>
+
                 <Form.Group
-                  controlId={thirdDropdownData.name}
-                  key={thirdDropdownData.name}
+                  controlId={sequenceOrPincodeFieldData.name}
+                  key={sequenceOrPincodeFieldData.name}
                   style={{ padding: 5 }}
                 >
-                  <Form.Label>{thirdDropdownData.label}</Form.Label>
-                  <Form.Select
-                    id={thirdDropdownData.name}
+                  <Form.Label>{sequenceOrPincodeFieldData.label}</Form.Label>
+                  <Form.Control
                     size="sm"
-                    onChange={(event) =>
-                      handleOptionSelectThirdDropdown(event, setFieldValue)
+                    type="number"
+                    name={sequenceOrPincodeFieldData.name}
+                    value={values[sequenceOrPincodeFieldData.name]}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    isInvalid={
+                      touched[sequenceOrPincodeFieldData.name] &&
+                      errors[sequenceOrPincodeFieldData.name]
                     }
-                    value={thirdDropdownSelectedData || ""}
-                  >
-                    <option value="">Select {thirdDropdownData.label}</option>
-                    {thirdDropdownData.options.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors[sequenceOrPincodeFieldData.name]}
+                  </Form.Control.Feedback>
                 </Form.Group>
+                {isFromQuestion && (
+                  <Form.Group
+                    controlId={thirdDropdownData.name}
+                    key={thirdDropdownData.name}
+                    style={{ padding: 5 }}
+                  >
+                    <Form.Label>{thirdDropdownData.label}</Form.Label>
+                    <Form.Select
+                      id={thirdDropdownData.name}
+                      size="sm"
+                      onChange={(event) =>
+                        handleOptionSelectThirdDropdown(event, setFieldValue)
+                      }
+                      value={
+                        thirdDropdownSelectedData ||
+                        thirdDropdownData.defaultValue
+                      }
+                    >
+                      <option value="">Select {thirdDropdownData.label}</option>
+                      {thirdDropdownData.options.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                )}
+
                 {thirdDropdownSelectedData === "Dropdown" && (
                   <>
                     <Form.Label>Enter {questionDropdownData.label}</Form.Label>
                     <Row>
                       <Col>
-                        {values[questionDropdownData.name].map(
+                        {values[questionDropdownData.name]?.map(
                           (inputValue, index) => (
                             <div key={index}>
                               <Form.Group>
@@ -288,31 +319,6 @@ const FormDropdownModal = ({
                       Add Input Field
                     </Button>
                   </>
-                )}
-
-                {isFromQuestion && (
-                  <Form.Group
-                    controlId={sequenceFieldData.name}
-                    key={sequenceFieldData.name}
-                    style={{ padding: 5 }}
-                  >
-                    <Form.Label>{sequenceFieldData.label}</Form.Label>
-                    <Form.Control
-                      size="sm"
-                      type="number"
-                      name={sequenceFieldData.name}
-                      value={values[sequenceFieldData.name]}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      isInvalid={
-                        touched[sequenceFieldData.name] &&
-                        errors[sequenceFieldData.name]
-                      }
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors[areaOrQuestionInputFieldData.name]}
-                    </Form.Control.Feedback>
-                  </Form.Group>
                 )}
 
                 <Button variant="primary" type="submit" disabled={isSubmitting}>
