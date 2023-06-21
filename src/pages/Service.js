@@ -12,9 +12,49 @@ export default function Service() {
   const [data, setData] = useState([]);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showForm, setShowForm] = useState(false);
+  const [modalHeading, setModalHeading] = useState("");
+  const [isFormEditCategory, setIsFormEditCategory] = useState(false);
+  const [editFormFields, setEditFormFields] = useState([]);
+  const [serviceSelectedForEdit, setServiceSelectedForEdit] = useState("");
 
-  //   const [loading, setLoading] = useState(false);
-
+  const formFields = [
+    {
+      name: "name",
+      label: "Name",
+      type: "text",
+    },
+    {
+      name: "icon",
+      label: "Icon",
+      type: "file",
+    },
+    {
+      name: "images",
+      label: "Images",
+      type: "file",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+    },
+    {
+      name: "phone",
+      label: "Phone",
+      type: "number",
+    },
+    {
+      name: "sequence",
+      label: "Sequence",
+      type: "Number",
+    },
+    {
+      name: "is_active",
+      label: "Is Active",
+      type: "checkbox",
+    },
+  ];
   const columns = [
     {
       name: "Sr No.",
@@ -37,7 +77,7 @@ export default function Service() {
     },
     {
       name: "Created On",
-      selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+      selector: (row) => moment(row.created_date).format("DD MMM YYYY"),
       compact: true,
     },
     {
@@ -47,7 +87,12 @@ export default function Service() {
           <MdModeEditOutline
             color="#444"
             size={20}
-            onClick={() => handleEdit()}
+            onClick={() => {
+              handleEditFormFields(row);
+              setModalHeading("Edit Location");
+              setIsFormEditCategory(true);
+              handleToggleModal();
+            }}
             cursor="pointer"
           />
           <MdDelete
@@ -61,7 +106,7 @@ export default function Service() {
               e.target.style.color = "#444";
             }}
             style={{ marginLeft: "10px" }}
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleDelete(row)}
           />
         </div>
       ),
@@ -81,7 +126,7 @@ export default function Service() {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log(services);
       setData(services);
     } catch (error) {
       console.log(JSON.stringify(error), 25);
@@ -94,7 +139,113 @@ export default function Service() {
     getService();
   }, []);
 
-  const deleteCategory = async (id) => {
+  const uploadImage = async (image) => {
+    try {
+      const imageData = new FormData();
+
+      imageData.append("file", image);
+
+      const token = LocalStorage.getData("token");
+
+      const url = `image/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+      const resp = await http.post(url, imageData, config);
+      console.log(resp, "199");
+      return resp;
+    } catch (error) {
+      console.log(error, "201");
+    }
+  };
+
+  const createService = async (serviceData, imagesResp) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = "service/";
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        name: serviceData.name,
+        description: serviceData.description,
+        phone: serviceData.phone,
+        images: imagesResp,
+        sequence: serviceData.sequence,
+        code: serviceData.name.trim(),
+        is_active: serviceData.is_active,
+      };
+      console.log("191", data);
+      const resp = await http.post(url, data, config);
+      console.log(resp);
+      return resp;
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
+  const updateService = async (serviceData, imagesResp) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = `service/${serviceSelectedForEdit.id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+      const data = {
+        name: serviceData.name,
+        description: serviceData.description,
+        phone: serviceData.phone,
+        images: imagesResp,
+        sequence: serviceData.sequence,
+        code: serviceData.name.trim(),
+        is_active: serviceData.is_active,
+      };
+
+      const resp = await http.put(url, data, config);
+      console.log(resp);
+      return resp;
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
+    }
+  };
+
+  const uploadIcon = async (icon, id) => {
+    try {
+      const iconData = new FormData();
+
+      iconData.append("file", icon);
+
+      const token = LocalStorage.getData("token");
+
+      const url = `service/icon/${id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      console.log(icon, id);
+      const resp = await http.post(url, iconData, config);
+      console.log(resp, "199");
+    } catch (error) {
+      console.log(error, "201");
+    }
+  };
+
+  const deleteService = async (id) => {
     try {
       const token = LocalStorage.getData("token");
       await http.delete(`service/${id}/`, {
@@ -107,16 +258,83 @@ export default function Service() {
     }
   };
 
-  const handleAdd = () => {
-    console.log("add");
+  const deleteImage = async (imageId) => {
+    try {
+      const token = LocalStorage.getData("token");
+      await http.delete(`image/${imageId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("deleted images");
+    } catch (error) {
+      console.log(error, "165");
+    }
   };
 
-  const handleEdit = () => {
-    console.log("edit");
+  const handleAdd = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    const imagesToUpload = values.images;
+    let uploadedImgArr = [];
+    if (imagesToUpload.length > 0) {
+      for (let [key, image] of Object.entries(imagesToUpload)) {
+        let resp = await uploadImage(image);
+        uploadedImgArr.push(resp);
+      }
+    }
+    const respService = await createService(values, uploadedImgArr);
+    await uploadIcon(values.icon, respService.id);
+    setShowForm(false);
+    setModalHeading("");
   };
 
-  const handleDelete = async (id) => {
-    await deleteCategory(id);
+  const handleEdit = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+
+    const imagesToUpload = values.images;
+    let uploadedImgArr = [];
+    if (values.isImgChanged) {
+      console.log("image se");
+      for (let [key, image] of Object.entries(imagesToUpload)) {
+        let resp = await uploadImage(image);
+        uploadedImgArr.push(resp);
+      }
+    } else {
+      uploadedImgArr = serviceSelectedForEdit.images;
+    }
+    await updateService(values, uploadedImgArr);
+    if (values.isIconChanged) {
+      console.log("icon se");
+      await uploadIcon(values.icon, serviceSelectedForEdit.id);
+    }
+    setShowForm(false);
+    setModalHeading("");
+  };
+
+  const handleEditFormFields = (rowData) => {
+    const fields = formFields.map((field) => {
+      return {
+        ...field,
+        defaultValue: rowData[field.name],
+      };
+    });
+    console.log(rowData, fields);
+    setServiceSelectedForEdit(rowData);
+    setEditFormFields(fields);
+  };
+
+  const handleDelete = async (rowData) => {
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteService(rowData.id);
+      if (rowData.images > 0) {
+        for (let [key, image] of Object.entries(rowData.images)) {
+          await deleteImage(image.id);
+        }
+      }
+    }
   };
 
   const handlePageChange = async (page) => {
@@ -125,6 +343,10 @@ export default function Service() {
   const handlePerRowsChange = async (newPerPage) => {
     setPerPage(newPerPage);
   };
+  const handleToggleModal = () => {
+    setShowForm(!showForm);
+    isFormEditCategory && setIsFormEditCategory(false);
+  };
 
   return (
     <div>
@@ -132,13 +354,20 @@ export default function Service() {
       <div className="d-flex">
         <SidebarMenu />
         <MainContent
+          title={"Service"}
           data={data}
           columns={columns}
-          handleAdd={handleAdd}
-          handleDelete={handleDelete}
+          modalHeading={modalHeading}
           handlePageChange={handlePageChange}
           handlePerRowsChange={handlePerRowsChange}
           isRemote={false}
+          handleToggleModal={handleToggleModal}
+          isAddFormVisible={true}
+          showForm={showForm}
+          formFields={isFormEditCategory ? editFormFields : formFields}
+          setModalHeading={setModalHeading}
+          formSubmitHandler={isFormEditCategory ? handleEdit : handleAdd}
+          isFormEditCategory={isFormEditCategory}
         />
       </div>
     </div>

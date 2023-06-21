@@ -65,27 +65,34 @@ const FormModal = ({
             type={field.type}
             name={field.name}
             onChange={(event) => {
-              const file = event.target.files[0];
+              let file = event.target.files[0];
+              if (field.name === "images") {
+                file = event.target.files;
+                setFieldValue("isImgChanged", true);
+              }
               setFieldValue(field.name, file);
               setFieldValue("isEdited", true);
+              setFieldValue("isIconChanged", true);
             }}
             accept="image/*"
+            multiple={field.name === "images"}
           />
         </Col>
 
         <Col>
-          {(values[field.name] || field.defaultValue) && (
-            <Image
-              src={
-                values["isEdited"]
-                  ? URL.createObjectURL(values[field.name])
-                  : field.defaultValue
-              }
-              width={35}
-              height={35}
-              rounded
-            />
-          )}
+          {!(field.name === "images") &&
+            (values[field.name] || field.defaultValue) && (
+              <Image
+                src={
+                  values["isEdited"]
+                    ? URL.createObjectURL(values[field.name])
+                    : field.defaultValue
+                }
+                width={35}
+                height={35}
+                rounded
+              />
+            )}
         </Col>
       </Row>
     </>
@@ -112,6 +119,12 @@ const FormModal = ({
   formFields.forEach((field) => {
     initialValues[field.name] = field.defaultValue ?? "";
     validationSchema[field.name] = field.validation;
+    if (field.name === "images") {
+      initialValues["isImgChanged"] = false;
+    }
+    if (field.name === "icon") {
+      initialValues["isIconChanged"] = false;
+    }
   });
 
   const handleOptionSelect = (event, field, setFieldValue) => {

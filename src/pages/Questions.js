@@ -221,19 +221,19 @@ export default function Questions() {
     }
   };
 
-  // const deleteCategory = async (id) => {
-  //   try {
-  //     const token = LocalStorage.getData("token");
+  const deleteQuestion = async (id) => {
+    try {
+      const token = LocalStorage.getData("token");
 
-  //     await http.delete(`question/${id}/`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log(error, "165");
-  //   }
-  // };
+      await http.delete(`question/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.log(error, "165");
+    }
+  };
 
   const handlePageChange = async (page) => {
     setCurrentPage(page);
@@ -309,7 +309,7 @@ export default function Questions() {
   };
 
   const handleDelete = async (id) => {
-    //await deleteCategory(id);
+    await deleteQuestion(id);
   };
 
   return (

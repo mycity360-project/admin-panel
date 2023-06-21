@@ -258,7 +258,7 @@ export default function Category() {
     event.preventDefault();
     console.log("hi", values);
     const resp = await createCategory(values);
-    resp && (await uploadIcon(values.icon, resp.id));
+    await uploadIcon(values.icon, resp.id);
     setShowForm(false);
     setModalHeading("");
   };
