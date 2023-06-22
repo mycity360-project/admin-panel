@@ -17,6 +17,8 @@ export default function SubCategory() {
   const [modalHeading, setModalHeading] = useState("");
   const [isFormEditCategory, setIsFormEditCategory] = useState(false);
   const [editFormFields, setEditFormFields] = useState([]);
+  const [subCategoryIdSelectedForEdit, setSubCategoryIdSelectedForEdit] =
+    useState("");
   //   const [loading, setLoading] = useState(false);
 
   const formFields = [
@@ -27,6 +29,16 @@ export default function SubCategory() {
       options: categories,
     },
     { name: "name", label: "Name", type: "text" },
+    {
+      name: "sequence",
+      label: "Sequence",
+      type: "number",
+    },
+    {
+      name: "is_active",
+      label: "Is Active",
+      type: "checkbox",
+    },
   ];
 
   const columns = [
@@ -46,8 +58,12 @@ export default function SubCategory() {
       selector: (row) => row.category.name,
     },
     {
+      name: "Sequence",
+      selector: (row) => row.sequence,
+    },
+    {
       name: "Created On",
-      selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+      selector: (row) => moment(row.created_date).format("DD MMM YYYY"),
 
       compact: true,
     },
@@ -101,7 +117,7 @@ export default function SubCategory() {
             },
           }
         );
-
+        console.log(categoriesRespData.results);
         setTotalRows(categoriesRespData.count);
         setData(categoriesRespData.results);
       } catch (error) {
@@ -184,12 +200,36 @@ export default function SubCategory() {
       const data = {
         category_id: values.category,
         name: values.name,
-        phone: values.phone,
-        is_price: values.is_price_required,
-        price_limit: values.price_limit,
+        sequence: values.sequence,
+        is_active: values.is_active,
       };
 
       const resp = await http.post(url, data, config);
+
+      return resp;
+    } catch (error) {
+      console.log(error, "223");
+    }
+  };
+
+  const updateSubCategory = async (SubCategoryData) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = `category/${subCategoryIdSelectedForEdit}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        category_id: SubCategoryData.category.id,
+        name: SubCategoryData.name,
+        sequence: SubCategoryData.sequence,
+        is_active: SubCategoryData.is_active,
+      };
+
+      const resp = await http.put(url, data, config);
 
       return resp;
     } catch (error) {
@@ -205,8 +245,12 @@ export default function SubCategory() {
     setModalHeading("");
   };
 
-  const handleEdit = (values) => {
-    console.log("edit", values);
+  const handleEdit = async (event, values) => {
+    event.preventDefault();
+    console.log("hi", values);
+    await updateSubCategory(values);
+    setShowForm(false);
+    setModalHeading("");
   };
 
   const handleDelete = async (id) => {
@@ -224,6 +268,7 @@ export default function SubCategory() {
       };
     });
     console.log(rowData, fields);
+    setSubCategoryIdSelectedForEdit(rowData.id);
     setEditFormFields(fields);
   };
   return (

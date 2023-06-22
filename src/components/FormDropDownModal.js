@@ -15,7 +15,6 @@ const FormDropdownModal = ({
   formFields,
   handleSecondDropdownData,
 }) => {
-  console.log(formFields, 18);
   const initialValues = {};
   const validationSchema = {};
   const [firstDropdownData, setFirstDropdownData] = useState(formFields[0]);
@@ -44,6 +43,7 @@ const FormDropdownModal = ({
     initialValues[field.name] = field.defaultValue ?? "";
     validationSchema[field.name] = field.validation;
   });
+  console.log(initialValues, "46");
 
   useEffect(() => {
     setFirstDropdownData(formFields[0]);
@@ -58,9 +58,10 @@ const FormDropdownModal = ({
 
   useEffect(() => {
     if (secondDropdownData.options?.length) {
+      console.log("inside");
       setShowSecondDropdown(true);
     }
-    console.log(secondDropdownData);
+    console.log("secondDropdownData", secondDropdownData);
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event, setFieldValue) => {
@@ -137,7 +138,6 @@ const FormDropdownModal = ({
                     onChange={(event) =>
                       handleOptionSelectFirstDropdown(event, setFieldValue)
                     }
-                    // onClick={() => setShowSecondDropdown(false)}
                     value={
                       firstDropdownSelectedData
                         ? firstDropdownSelectedData?.id

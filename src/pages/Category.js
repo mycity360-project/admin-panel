@@ -45,8 +45,18 @@ export default function Category() {
       defaultValue: true,
     },
     {
+      name: "is_active",
+      label: "Is Active",
+      type: "checkbox",
+    },
+    {
       name: "phone",
       label: "Phone",
+      type: "number",
+    },
+    {
+      name: "sequence",
+      label: "Sequence",
       type: "number",
     },
   ];
@@ -58,7 +68,10 @@ export default function Category() {
         return <div> {(currentPage - 1) * perPage + (index + 1)}</div>;
       },
     },
-
+    {
+      name: "Sequence",
+      selector: (row) => row.sequence,
+    },
     {
       name: "Category",
       selector: (row) => row.name,
@@ -70,7 +83,7 @@ export default function Category() {
       },
     },
     {
-      name: "Price\nRequired ",
+      name: "Price Required ",
       cell: (row) => <Checkbox value={row.isPrice} isDisabled={true} />,
       selector: (row) => row.isPrice,
     },
@@ -134,7 +147,7 @@ export default function Category() {
           id: category.id,
           name: category.name,
           icon: category.icon,
-          seq: category.sequence,
+          sequence: category.sequence,
           is_price: category.is_price,
           created_on: category.created_date,
           price_limit: category.price_limit,
@@ -220,6 +233,8 @@ export default function Category() {
         phone: values.phone,
         is_price: values.is_price_required,
         price_limit: values.price_limit,
+        sequence: values.sequence,
+        is_active: values.is_active,
       };
       const resp = await http.post(url, data, config);
       console.log(resp);

@@ -37,3 +37,8 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.custom-head-cell {
+  white-space: normal !important; /* Use !important to override any conflicting styles */
+  word-break: break-word !important;
+}

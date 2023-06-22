@@ -63,6 +63,10 @@ export default function Service() {
       ),
     },
     {
+      name: "Sequence",
+      selector: (row) => row.sequence,
+    },
+    {
       name: "Name",
       selector: (row) => row.name,
     },
@@ -278,7 +282,7 @@ export default function Service() {
     const imagesToUpload = values.images;
     let uploadedImgArr = [];
     if (imagesToUpload.length > 0) {
-      for (let [key, image] of Object.entries(imagesToUpload)) {
+      for (let [_, image] of Object.entries(imagesToUpload)) {
         let resp = await uploadImage(image);
         uploadedImgArr.push(resp);
       }
@@ -297,7 +301,7 @@ export default function Service() {
     let uploadedImgArr = [];
     if (values.isImgChanged) {
       console.log("image se");
-      for (let [key, image] of Object.entries(imagesToUpload)) {
+      for (let [_, image] of Object.entries(imagesToUpload)) {
         let resp = await uploadImage(image);
         uploadedImgArr.push(resp);
       }
@@ -330,7 +334,7 @@ export default function Service() {
     if (shouldDelete) {
       await deleteService(rowData.id);
       if (rowData.images > 0) {
-        for (let [key, image] of Object.entries(rowData.images)) {
+        for (let [_, image] of Object.entries(rowData.images)) {
           await deleteImage(image.id);
         }
       }

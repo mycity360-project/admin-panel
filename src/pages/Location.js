@@ -25,6 +25,11 @@ export default function Location() {
       options: states,
     },
     { name: "name", label: "Location", type: "text" },
+    {
+      name: "is_active",
+      label: "Is Active",
+      type: "checkbox",
+    },
   ];
 
   const columns = [
@@ -34,12 +39,13 @@ export default function Location() {
         <div>{(currentPage - 1) * perPage + (index + 1)}</div>
       ),
     },
+
     {
       name: "Name",
       selector: (row) => row.name,
     },
     {
-      name: "state",
+      name: "State",
       selector: (row) => row.state.name,
     },
     {
@@ -150,6 +156,7 @@ export default function Location() {
       const data = {
         name: locationData.name,
         state: { id: locationData.state },
+        is_active: locationData.is_active,
       };
 
       const resp = await http.post(url, data, config);
@@ -182,6 +189,7 @@ export default function Location() {
       const data = {
         state: { id: locationData.state.id },
         name: locationData.name,
+        is_active: locationData.is_active,
       };
 
       console.log(data);

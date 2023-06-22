@@ -58,11 +58,11 @@ export default function Questions() {
       ),
     },
     {
-      name: "question",
+      name: "Question",
       selector: (row) => row.question,
     },
     {
-      name: "Feild Type",
+      name: "Field Type",
       selector: (row) => row.field_type,
     },
     {
@@ -71,13 +71,18 @@ export default function Questions() {
       selector: (row) => row.is_required,
     },
     {
+      name: "Is Deleted",
+      cell: (row) => <Checkbox value={row.is_deleted} isDisabled={true} />,
+      selector: (row) => row.is_deleted,
+    },
+    {
       name: "Created On",
-      selector: (row) => moment(row.created_on).format("DD MMM YYYY"),
+      selector: (row) => moment(row.created_date).format("DD MMM YYYY"),
       compact: true,
     },
     {
-      name: "Category/Sub-category",
-      selector: (row) => row.category.id,
+      name: "Category/ Sub Category",
+      selector: (row) => <div className="text-center">{row.category.id}</div>,
     },
     {
       name: "Action",
@@ -87,10 +92,9 @@ export default function Questions() {
             color="#444"
             size={20}
             onClick={async () => {
-              setModalHeading("Edit Category");
-              setIsFormEditCategory(true);
-              handleSecondDropdownData(row.category?.id);
               handleEditFormFields(row);
+              setModalHeading("Edit Question");
+              setIsFormEditCategory(true);
               handleToggleModal();
             }}
             cursor="pointer"
@@ -212,8 +216,10 @@ export default function Questions() {
         },
         ...fields.slice(2),
       ];
-      setFields(items);
+      console.log(items, "219");
       setEditFormFields(items);
+      setFields(items);
+      return items;
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     } finally {
@@ -284,6 +290,23 @@ export default function Questions() {
     }
   };
 
+  const checkCategoryOrSubCategory = async (id) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = `category/${id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+
+      const resp = await http.get(url, config);
+
+      return resp;
+    } catch (error) {
+      console.log(JSON.stringify(error), "from checkCategory");
+    }
+  };
   const handleAdd = async (event, values) => {
     event.preventDefault();
     console.log("hi", values);
@@ -292,24 +315,53 @@ export default function Questions() {
     setModalHeading("");
   };
 
-  const handleEdit = (event, values) => {
+  const handleEdit = async (event, values) => {
     event.preventDefault();
     console.log("edit", values);
   };
 
-  const handleEditFormFields = (rowData) => {
+  const handleEditFormFields = async (rowData) => {
+    console.log("row", rowData);
+    let categoryId, subCategoryId, cate, subCat, rest;
+    const resp = await checkCategoryOrSubCategory(rowData.category.id);
+    if (resp.category == null) {
+      categoryId = resp.id;
+      subCategoryId = "";
+    } else {
+      [cate, subCat, ...rest] = await getSubCategories(resp.category.id);
+      categoryId = resp.category.id;
+      subCategoryId = resp.id;
+    }
+    console.log(subCat, "333");
+
     const fieldData = editFormFields.map((field) => {
-      return {
-        ...field,
-        defaultValue: rowData[field.name],
-      };
+      if (field.name === "category") {
+        return {
+          ...field,
+          defaultValue: { id: categoryId },
+        };
+      } else if (field.name === "subcategory") {
+        return {
+          ...subCat,
+          defaultValue: subCategoryId ? { id: subCategoryId } : "",
+        };
+      } else {
+        return {
+          ...field,
+          defaultValue: rowData[field.name],
+        };
+      }
     });
-    console.log(fieldData);
+
+    console.log(fieldData, "349");
     setEditFormFields(fieldData);
   };
 
   const handleDelete = async (id) => {
-    await deleteQuestion(id);
+    const shouldDelete = window.confirm("Are you sure you want to delete it ?");
+    if (shouldDelete) {
+      await deleteQuestion(id);
+    }
   };
 
   return (

@@ -70,9 +70,10 @@ const FormModal = ({
                 file = event.target.files;
                 setFieldValue("isImgChanged", true);
               }
+              if (field.name === "icon") {
+                setFieldValue("isIconChanged", true);
+              }
               setFieldValue(field.name, file);
-              setFieldValue("isEdited", true);
-              setFieldValue("isIconChanged", true);
             }}
             accept="image/*"
             multiple={field.name === "images"}
@@ -84,7 +85,7 @@ const FormModal = ({
             (values[field.name] || field.defaultValue) && (
               <Image
                 src={
-                  values["isEdited"]
+                  values["isIconChanged"]
                     ? URL.createObjectURL(values[field.name])
                     : field.defaultValue
                 }

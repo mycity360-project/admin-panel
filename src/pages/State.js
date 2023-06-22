@@ -16,7 +16,14 @@ export default function State() {
   const [editFormFields, setEditFormFields] = useState([]);
   const [stateIdSelectedForEdit, setStateIdSelectedForEdit] = useState("");
 
-  const formFields = [{ name: "name", label: "Location", type: "text" }];
+  const formFields = [
+    { name: "name", label: "Location", type: "text" },
+    {
+      name: "is_active",
+      label: "Is Active",
+      type: "checkbox",
+    },
+  ];
 
   const columns = [
     {
@@ -25,6 +32,7 @@ export default function State() {
         <div>{(currentPage - 1) * perPage + (index + 1)}</div>
       ),
     },
+
     {
       name: "Name",
       selector: (row) => row.name,
@@ -121,6 +129,7 @@ export default function State() {
 
       const data = {
         name: stateData.name,
+        is_active: stateData.is_active,
       };
 
       const resp = await http.post(url, data, config);
@@ -144,9 +153,9 @@ export default function State() {
 
       const data = {
         name: stateData.name,
+        is_active: stateData.is_active,
       };
 
-      console.log(data);
       const resp = await http.put(url, data, config);
       console.log(resp);
     } catch (error) {
