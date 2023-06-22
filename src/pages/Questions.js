@@ -122,8 +122,6 @@ export default function Questions() {
 
   const getQuestions = useCallback(
     async (page) => {
-      // setLoading(true);
-
       try {
         const token = LocalStorage.getData("token");
 
@@ -140,8 +138,6 @@ export default function Questions() {
         setData(questionResp.results);
       } catch (error) {
         console.log(JSON.stringify(error), 25);
-      } finally {
-        //   setLoading(false);
       }
     },
     [perPage]
@@ -167,18 +163,19 @@ export default function Questions() {
         id: category.id,
         name: category.name,
       }));
+
       const items = [...formFields];
+
       items.splice(0, 1, {
         name: "category",
         label: "Category",
         options: categories,
       });
+
       setFields(items);
       setEditFormFields(items);
     } catch (error) {
       console.log(error, "145");
-    } finally {
-      //   setLoading(false);
     }
   }, [formFields]);
 
@@ -202,12 +199,7 @@ export default function Questions() {
         id: category.id,
         name: category.name,
       }));
-      // const items = [...fields];
-      // items.splice(1, 1, {
-      //   name: "subcategory",
-      //   label: "Sub Category",
-      //   options: subcategories,
-      // });
+
       const items = [
         fields[0],
         {
@@ -216,14 +208,13 @@ export default function Questions() {
         },
         ...fields.slice(2),
       ];
-      console.log(items, "219");
+
       setEditFormFields(items);
       setFields(items);
       return items;
+
     } catch (error) {
       console.log(JSON.stringify(error), 25);
-    } finally {
-      //   setLoading(false);
     }
   };
 
@@ -296,7 +287,7 @@ export default function Questions() {
       const url = `category/${id}/`;
       const config = {
         headers: {
-          " Authorization": `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
         },
       };
 
@@ -317,18 +308,17 @@ export default function Questions() {
 
   const handleEdit = async (event, values) => {
     event.preventDefault();
-    console.log("edit", values);
   };
 
   const handleEditFormFields = async (rowData) => {
     console.log("row", rowData);
-    let categoryId, subCategoryId, cate, subCat, rest;
+    let categoryId, subCategoryId, subCat = "";
     const resp = await checkCategoryOrSubCategory(rowData.category.id);
     if (resp.category == null) {
       categoryId = resp.id;
       subCategoryId = "";
     } else {
-      [cate, subCat, ...rest] = await getSubCategories(resp.category.id);
+      [, subCat,] = await getSubCategories(resp.category.id);
       categoryId = resp.category.id;
       subCategoryId = resp.id;
     }

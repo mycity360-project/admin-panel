@@ -58,10 +58,8 @@ const FormDropdownModal = ({
 
   useEffect(() => {
     if (secondDropdownData.options?.length) {
-      console.log("inside");
       setShowSecondDropdown(true);
     }
-    console.log("secondDropdownData", secondDropdownData);
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event, setFieldValue) => {
@@ -192,7 +190,7 @@ const FormDropdownModal = ({
                     size="sm"
                     type="text"
                     name={areaOrQuestionInputFieldData.name}
-                    value={values[areaOrQuestionInputFieldData.name]}
+                    value={values[areaOrQuestionInputFieldData.name] || initialValues[areaOrQuestionInputFieldData.name]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={
@@ -215,7 +213,7 @@ const FormDropdownModal = ({
                     size="sm"
                     type="number"
                     name={sequenceOrPincodeFieldData.name}
-                    value={values[sequenceOrPincodeFieldData.name]}
+                    value={values[sequenceOrPincodeFieldData.name] || initialValues[sequenceOrPincodeFieldData.name]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={
