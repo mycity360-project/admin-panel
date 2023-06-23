@@ -13,10 +13,10 @@ const FormDropdownModal = ({
   handleSecondDropdownData,
 }) => {
   const [formValues, setFormValues] = useState({});
-  formFields.forEach((field) => {
+  for (const field of formFields) {
     const { name, defaultValue } = field;
     formValues[name] = defaultValue ?? "";
-  });
+  }
 
   const [firstDropdownData, setFirstDropdownData] = useState(formFields[0]);
   const [secondDropdownData, setSecondDropdownData] = useState(formFields[1]);
@@ -48,6 +48,17 @@ const FormDropdownModal = ({
     questionDropdownData.options || [""]
   );
   const [showSecondDropdown, setShowSecondDropdown] = useState(false);
+  const [showPrefilledValuesFields, setShowPrefilledValuesFields] =
+    useState(false);
+  const [showValuesFields, setShowValuesFields] = useState(false);
+
+  useEffect(() => {
+    console.log("useffect", formValues);
+    if (formValues[thirdDropdownData.name] === "Dropdown") {
+      console.log("inside if useeffect");
+      setShowPrefilledValuesFields(true);
+    }
+  }, [formValues, thirdDropdownData.name]);
 
   useEffect(() => {
     setFirstDropdownData(formFields[0]);
@@ -58,18 +69,12 @@ const FormDropdownModal = ({
       setThirdDropdownData(formFields[4]);
       setQuestionDropdownData(formFields[5]);
     }
-    console.log(
-      formValues[areaOrQuestionInputFieldData.name],
-      isFromQuestion,
-      "first"
-    );
   }, [formFields, isFromQuestion]);
 
   useEffect(() => {
     if (secondDropdownData.options?.length) {
       setShowSecondDropdown(true);
     }
-    console.log(formValues[areaOrQuestionInputFieldData.name], "second");
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event) => {
@@ -91,8 +96,14 @@ const FormDropdownModal = ({
   };
 
   const handleOptionSelectThirdDropdown = (event) => {
+    setShowPrefilledValuesFields(false);
     const selectedValue = event.target.value;
     setThirdDropdownSelectedData(selectedValue);
+    if (selectedValue === "Dropdown") {
+      setShowValuesFields(true);
+    } else {
+      setShowValuesFields(false);
+    }
   };
 
   const handleAddInputField = () => {
@@ -266,8 +277,7 @@ const FormDropdownModal = ({
                 </Form.Select>
               </Form.Group>
             )}
-            {(thirdDropdownSelectedData === "Dropdown" ||
-              formValues[thirdDropdownData.name] === "Dropdown") && (
+            {(showPrefilledValuesFields || showValuesFields) && (
               <>
                 <Form.Label>Enter {questionDropdownData.label}</Form.Label>
                 <Row>

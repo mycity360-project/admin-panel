@@ -271,7 +271,6 @@ export default function Questions() {
           ? { values: quesData.values }
           : {}),
       };
-      // console.log(data);
       const resp = await http.post(url, data, config);
       console.log(resp);
     } catch (error) {
@@ -308,9 +307,21 @@ export default function Questions() {
           " Authorization": `Bearer ${token}`,
         },
       };
-      const data = {};
+      const data = {
+        question: quesData.question,
+        sequence: quesData.sequence,
+        category: {
+          ...(quesData.subcategory
+            ? { id: quesData.subcategory.id }
+            : { id: quesData.category.id }),
+        },
+        field_type: quesData.field_type,
+        ...(quesData.field_type === "Dropdown"
+          ? { values: quesData.values }
+          : {}),
+      };
       // console.log(data);
-      const resp = await http.post(url, data, config);
+      const resp = await http.put(url, data, config);
       console.log(resp);
     } catch (error) {
       console.log(JSON.stringify(error), 245);
@@ -329,7 +340,7 @@ export default function Questions() {
   const handleEdit = async (event, values) => {
     event.preventDefault();
     console.log("hi", values);
-    //await updateQuestion(values);
+    await updateQuestion(values);
     setShowForm(false);
     setModalHeading("");
   };
