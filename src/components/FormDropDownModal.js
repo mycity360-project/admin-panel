@@ -71,11 +71,12 @@ const FormDropdownModal = ({
       (option) => option.id === parseInt(selectedId)
     );
     setFirstDropdownSelectedData(selectedItem);
-
-    setFormValues((prevValues) => ({
-      ...prevValues,
+    console.log(event, firstDropdownData.name , selectedItem, "saddasadsdsaads")
+    setFormValues({
+      ...formValues,
       [firstDropdownData.name]: selectedItem,
-    }));
+    });
+    console.log(formValues)
   };
 
   const handleOptionSelectSecondDropdown = (event) => {
