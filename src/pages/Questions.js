@@ -18,6 +18,7 @@ export default function Questions() {
   const [isFormEditCategory, setIsFormEditCategory] = useState(false);
   const [fields, setFields] = useState([]);
   const [editFormFields, setEditFormFields] = useState([]);
+  const [questionSelectedForEdit, setQuestionSelectedForEdit] = useState("");
 
   const formFields = useMemo(() => {
     return [
@@ -92,8 +93,8 @@ export default function Questions() {
             color="#444"
             size={20}
             onClick={async () => {
-              handleEditFormFields(row);
               setModalHeading("Edit Question");
+              handleEditFormFields(row);
               setIsFormEditCategory(true);
               handleToggleModal();
             }}
@@ -212,7 +213,6 @@ export default function Questions() {
       setEditFormFields(items);
       setFields(items);
       return items;
-
     } catch (error) {
       console.log(JSON.stringify(error), 25);
     }
@@ -287,7 +287,7 @@ export default function Questions() {
       const url = `category/${id}/`;
       const config = {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       };
 
@@ -296,6 +296,26 @@ export default function Questions() {
       return resp;
     } catch (error) {
       console.log(JSON.stringify(error), "from checkCategory");
+    }
+  };
+
+  const updateQuestion = async (quesData) => {
+    try {
+      const token = LocalStorage.getData("token");
+      const url = `question/${questionSelectedForEdit.id}/`;
+      const config = {
+        headers: {
+          " Authorization": `Bearer ${token}`,
+        },
+      };
+      const data = {};
+      // console.log(data);
+      const resp = await http.post(url, data, config);
+      console.log(resp);
+    } catch (error) {
+      console.log(JSON.stringify(error), 245);
+    } finally {
+      //   setLoading(false);
     }
   };
   const handleAdd = async (event, values) => {
@@ -308,17 +328,23 @@ export default function Questions() {
 
   const handleEdit = async (event, values) => {
     event.preventDefault();
+    console.log("hi", values);
+    //await updateQuestion(values);
+    setShowForm(false);
+    setModalHeading("");
   };
 
   const handleEditFormFields = async (rowData) => {
     console.log("row", rowData);
-    let categoryId, subCategoryId, subCat = "";
+    let categoryId,
+      subCategoryId,
+      subCat = "";
     const resp = await checkCategoryOrSubCategory(rowData.category.id);
     if (resp.category == null) {
       categoryId = resp.id;
       subCategoryId = "";
     } else {
-      [, subCat,] = await getSubCategories(resp.category.id);
+      [, subCat] = await getSubCategories(resp.category.id);
       categoryId = resp.category.id;
       subCategoryId = resp.id;
     }
@@ -345,6 +371,7 @@ export default function Questions() {
 
     console.log(fieldData, "349");
     setEditFormFields(fieldData);
+    setQuestionSelectedForEdit(rowData);
   };
 
   const handleDelete = async (id) => {
