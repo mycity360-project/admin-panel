@@ -25,28 +25,34 @@ export default function Questions() {
       {
         name: "category",
         label: "Category",
+        type: "dropdown",
       },
       {
         name: "subcategory",
         label: "Sub Category",
+        type: "dropdown",
       },
       {
         name: "question",
         label: "Question",
+        type: "text",
       },
       {
         name: "sequence",
         label: "Sequence",
+        type: "number",
       },
       {
         name: "field_type",
         label: "Field Type",
         options: ["Text", "Number", "Dropdown", "Toggle"],
+        type: "dropdown",
       },
       {
         name: "values",
         label: "Values",
         defaultValue: [""],
+        type: "text",
       },
     ];
   }, []);
@@ -165,13 +171,13 @@ export default function Questions() {
         name: category.name,
       }));
 
-      const items = [...formFields];
-
-      items.splice(0, 1, {
-        name: "category",
-        label: "Category",
-        options: categories,
-      });
+      const items = [
+        {
+          ...formFields[0],
+          options: categories,
+        },
+        ...formFields.slice(1),
+      ];
 
       setFields(items);
       setEditFormFields(items);

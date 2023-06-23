@@ -62,7 +62,8 @@ export const MainContent = ({
         }}
         paginationRowsPerPageOptions={[10, 15]}
       />
-      {!isFormReqDropdown && showForm && (
+      {/* {!isFormReqDropdown &&  */}
+      {showForm && (
         <FormModal
           show={showForm}
           formFields={formFields}
@@ -70,9 +71,10 @@ export const MainContent = ({
           modalHeading={modalHeading}
           isFormEditCategory={isFormEditCategory}
           formSubmitHandler={formSubmitHandler}
+          handleSecondDropdownData={handleSecondDropdownData}
         />
       )}
-      {isFormReqDropdown && showForm && (
+      {/* {isFormReqDropdown && showForm && (
         <FormDropdownModal
           show={showForm}
           onHide={() => handleToggleModal()}
@@ -83,7 +85,7 @@ export const MainContent = ({
           isFromQuestion={isFromQuestion}
           handleSecondDropdownData={handleSecondDropdownData}
         />
-      )}
+      )} */}
     </Container>
   );
 };

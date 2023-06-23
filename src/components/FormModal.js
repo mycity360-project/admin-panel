@@ -10,6 +10,7 @@ const FormModal = ({
   modalHeading,
   formSubmitHandler,
   isFormEditCategory,
+  handleSecondDropdownData,
 }) => {
   const initialValues = {};
   const validationSchema = {};
@@ -99,17 +100,19 @@ const FormModal = ({
     </>
   );
 
-  const Dropdown = ({ field, setFieldValue, handleSecondDropdown }) => (
+  const Dropdown = ({ values, field, setFieldValue }) => (
     <Form.Select
       id={field.name}
       size="sm"
-      onChange={(event) =>
-        handleOptionSelect(event, field, setFieldValue, handleSecondDropdown)
-      }
-      value={selectedOption ? selectedOption.id : field.defaultValue?.id}
+      onChange={(event) => {
+        handleOptionSelect(event, field, setFieldValue);
+        field.name !== "subcategory" &&
+          handleSecondDropdownData(event.target.value);
+      }}
+      value={values[field.name] || field.defaultValue?.id}
     >
-      <option value="">Select {field.label}</option>
-      {field.options.map((option) => (
+      <option value="">Select {field?.label}</option>
+      {field.options?.map((option) => (
         <option key={option.id} value={option.id}>
           {option.name}
         </option>
@@ -130,12 +133,11 @@ const FormModal = ({
 
   const handleOptionSelect = (event, field, setFieldValue) => {
     const selectedId = event.target.value;
-    const selectedItem = field.options.find(
-      (option) => option.id === parseInt(selectedId)
-    );
-    setSelectedOption(selectedItem);
-
-    setFieldValue(`${field.name}`, parseInt(selectedId));
+    // const selectedItem = field.options.find(
+    //   (option) => option.id === parseInt(selectedId)
+    // );
+    // setSelectedOption(selectedItem);
+    setFieldValue(field.name, parseInt(selectedId));
   };
 
   const renderField = (
