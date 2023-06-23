@@ -263,12 +263,12 @@ export default function Questions() {
         sequence: quesData.sequence,
         category: {
           ...(quesData.subcategory
-            ? { id: quesData.subcategory }
-            : { id: quesData.category }),
+            ? { id: quesData.subcategory.id }
+            : { id: quesData.category.id }),
         },
         field_type: quesData.field_type,
         ...(quesData.field_type === "Dropdown"
-          ? { values: quesData.values_dropdown }
+          ? { values: quesData.values }
           : {}),
       };
       // console.log(data);

@@ -17,6 +17,7 @@ const FormDropdownModal = ({
     const { name, defaultValue } = field;
     formValues[name] = defaultValue ?? "";
   });
+
   const [firstDropdownData, setFirstDropdownData] = useState(formFields[0]);
   const [secondDropdownData, setSecondDropdownData] = useState(formFields[1]);
   const [thirdDropdownData, setThirdDropdownData] = useState(
@@ -43,7 +44,9 @@ const FormDropdownModal = ({
   );
   const [sequenceOrPincodeFieldValue, setSequenceOrPincodeFieldValue] =
     useState(formValues[sequenceOrPincodeFieldData.name]);
-
+  const [dropdownQuestValues, setDropdownQuestValues] = useState(
+    questionDropdownData.options || [""]
+  );
   const [showSecondDropdown, setShowSecondDropdown] = useState(false);
 
   useEffect(() => {
@@ -55,12 +58,18 @@ const FormDropdownModal = ({
       setThirdDropdownData(formFields[4]);
       setQuestionDropdownData(formFields[5]);
     }
+    console.log(
+      formValues[areaOrQuestionInputFieldData.name],
+      isFromQuestion,
+      "first"
+    );
   }, [formFields, isFromQuestion]);
 
   useEffect(() => {
     if (secondDropdownData.options?.length) {
       setShowSecondDropdown(true);
     }
+    console.log(formValues[areaOrQuestionInputFieldData.name], "second");
   }, [secondDropdownData]);
 
   const handleOptionSelectFirstDropdown = (event) => {
@@ -71,12 +80,6 @@ const FormDropdownModal = ({
       (option) => option.id === parseInt(selectedId)
     );
     setFirstDropdownSelectedData(selectedItem);
-    console.log(event, firstDropdownData.name , selectedItem, "saddasadsdsaads")
-    setFormValues({
-      ...formValues,
-      [firstDropdownData.name]: selectedItem,
-    });
-    console.log(formValues)
   };
 
   const handleOptionSelectSecondDropdown = (event) => {
@@ -92,25 +95,14 @@ const FormDropdownModal = ({
     setThirdDropdownSelectedData(selectedValue);
   };
 
-  const handleAddInputField = (values, setValues) => {
-    setValues((prevValues) => ({
-      ...prevValues,
-      [questionDropdownData.name]: [
-        ...(prevValues[questionDropdownData.name] || []),
-        "",
-      ],
-    }));
+  const handleAddInputField = () => {
+    setDropdownQuestValues([...dropdownQuestValues, ""]);
   };
 
-  const handleDeleteInputField = (index, setValues) => {
-    setValues((prevValues) => {
-      const updatedValues = [...prevValues[questionDropdownData.name]];
-      updatedValues.splice(index, 1);
-      return {
-        ...prevValues,
-        [questionDropdownData.name]: updatedValues,
-      };
-    });
+  const handleDeleteInputField = (index) => {
+    const updatedValues = [...dropdownQuestValues];
+    updatedValues.splice(index, 1);
+    setDropdownQuestValues(updatedValues);
   };
   const handleareaOrQuestionFieldChange = (event) => {
     setAreaOrQuestionFieldValue(event.target.value);
@@ -124,10 +116,33 @@ const FormDropdownModal = ({
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    const values = Object.fromEntries(formData.entries());
 
-    console.log(formValues);
-    // formSubmitHandler(event, values);
+    const filteredEntries = Array.from(formData.entries()).filter(([key]) =>
+      [
+        areaOrQuestionInputFieldData.name,
+        sequenceOrPincodeFieldData.name,
+      ].includes(key)
+    );
+    const values = Object.fromEntries(filteredEntries);
+
+    const dropdownValues = {
+      [firstDropdownData.name]:
+        firstDropdownSelectedData || formValues[firstDropdownData.name],
+      [secondDropdownData.name]:
+        secondDropdownSelectedData || formValues[secondDropdownData.name],
+      [thirdDropdownData.name]:
+        thirdDropdownSelectedData || formValues[thirdDropdownData.name],
+    };
+    let formResp;
+    isFromQuestion
+      ? (formResp = {
+          ...values,
+          ...dropdownValues,
+          [questionDropdownData.name]: dropdownQuestValues,
+        })
+      : (formResp = { ...values, ...dropdownValues });
+    console.log(formResp);
+    formSubmitHandler(event, formResp);
   };
 
   return (
@@ -257,36 +272,38 @@ const FormDropdownModal = ({
                 <Form.Label>Enter {questionDropdownData.label}</Form.Label>
                 <Row>
                   <Col>
-                    {formValues[questionDropdownData.name]?.map(
-                      (inputValue, index) => {
-                        return (
-                          <div key={index}>
-                            <Form.Group>
-                              <Form.Control
-                                size="sm"
-                                type="text"
-                                name={`${questionDropdownData.name}[${index}]`}
-                                value={inputValue}
-                                onChange={(event) => {}}
-                              />
-                            </Form.Group>
-                            <MdDelete
-                              color="#333"
-                              size={20}
-                              cursor="pointer"
-                              style={{ marginLeft: "10px" }}
-                              onMouseEnter={(e) => {
-                                e.target.style.color = "red";
+                    {dropdownQuestValues?.map((inputValue, index) => {
+                      return (
+                        <div key={index}>
+                          <Form.Group>
+                            <Form.Control
+                              size="sm"
+                              type="text"
+                              name={`${dropdownQuestValues.name}[${index}]`}
+                              value={inputValue}
+                              onChange={(event) => {
+                                let updatedValues = [...dropdownQuestValues];
+                                updatedValues[index] = event.target.value;
+                                setDropdownQuestValues(updatedValues);
                               }}
-                              onMouseLeave={(e) => {
-                                e.target.style.color = "#333";
-                              }}
-                              onClick={() => handleDeleteInputField(index)}
                             />
-                          </div>
-                        );
-                      }
-                    )}
+                          </Form.Group>
+                          <MdDelete
+                            color="#333"
+                            size={20}
+                            cursor="pointer"
+                            style={{ marginLeft: "10px" }}
+                            onMouseEnter={(e) => {
+                              e.target.style.color = "red";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#333";
+                            }}
+                            onClick={() => handleDeleteInputField(index)}
+                          />
+                        </div>
+                      );
+                    })}
                   </Col>
                 </Row>
                 <Button
